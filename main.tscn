@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://2gycfvpavqnw"]
+
+[ext_resource type="Script" uid="uid://dg1otn2jcvxmu" path="res://Main.cs" id="1_ig7tw"]
+[ext_resource type="Shader" uid="uid://dt2wk80euv4f2" path="res://Entities/bullet.gdshader" id="2_0xm2m"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ig7tw"]
+shader = ExtResource("2_0xm2m")
+
+[node name="Main" type="Node2D" unique_id=1279899591]
+script = ExtResource("1_ig7tw")
+
+[node name="BulletRenderer" type="MultiMeshInstance2D" parent="." unique_id=1672732280]
+material = SubResource("ShaderMaterial_ig7tw")
