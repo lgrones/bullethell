@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using bullethell.Entities;
+using bullethell.Entities.Bullets;
 using Godot;
 
 namespace bullethell.Emitters.Patterns;

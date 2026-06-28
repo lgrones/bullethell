@@ -1,8 +1,6 @@
 using Godot;
 
-namespace bullethell.Entities;
-
-public readonly record struct BulletStyle(float Radius, float HitRadius, Color Color);
+namespace bullethell.Entities.Bullets;
 
 public struct Bullet
 {

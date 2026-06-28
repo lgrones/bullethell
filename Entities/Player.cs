@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using bullethell.Emitters;
+using bullethell.Entities.Bullets;
 using Godot;
 
 namespace bullethell.Entities;
@@ -6,15 +9,41 @@ public class Player
 {
     private const float Speed = 280f;
     private const float FocusSpeed = 110f;
+    private const float ShotSpeed = 900f;
     public const float Radius = 8f;
     public const float HitRadius = 3f;
 
     public Vector2 Position;
 
+    private readonly PlayerShotEmitter _emitter = new(
+        interval: 0.07f,
+        speed: ShotSpeed,
+        new BulletStyle(Radius: 4f, HitRadius: 4f, Colors.White));
+
     public void Spawn(Vector2 viewPort)
         => Position = new Vector2(viewPort.X * 0.5f, viewPort.Y * 0.8f);
 
-    public void Move(in FrameContext ctx)
+    public void Update(List<PlayerShot> sink, in FrameContext ctx)
+    {
+        Move(in ctx);
+
+        if (IsFiring())
+            _emitter.Update(Position + new Vector2(0, -Radius - 4f), sink, in ctx);
+    }
+
+    public bool IsHit(Vector2 position, float hitRadius)
+    {
+        var r = HitRadius + hitRadius;
+        return Position.DistanceSquaredTo(position) < r * r;
+    }
+
+    public static bool IsFocused()
+        => Input.IsActionPressed("focus");
+
+    private static bool IsFiring()
+        => Input.IsActionPressed("fire");
+
+    private void Move(in FrameContext ctx)
     {
         var direction = Input.GetVector(
             "ui_left",
@@ -26,13 +55,4 @@ public class Player
         Position.X = Mathf.Clamp(Position.X, 0, ctx.Viewport.X);
         Position.Y = Mathf.Clamp(Position.Y, 0, ctx.Viewport.Y);
     }
-
-    public bool IsHit(Vector2 position, float hitRadius)
-    {
-        var r = HitRadius + hitRadius;
-        return Position.DistanceSquaredTo(position) < r * r;
-    }
-
-    public static bool IsFocused()
-        => Input.IsActionPressed("focus");
 }
