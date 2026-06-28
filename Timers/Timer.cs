@@ -6,9 +6,9 @@ public class Timer(float duration)
     private float _duration = duration;
     public bool IsElapsed { get; private set; }
 
-    public void Update(in FrameContext ctx)
+    public void Update(float delta)
     {
-        _elapsed += ctx.Delta;
+        _elapsed += delta;
         IsElapsed = _elapsed >= _duration;
     }
 

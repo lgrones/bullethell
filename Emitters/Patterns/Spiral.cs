@@ -1,17 +1,29 @@
 using System.Collections.Generic;
-using bullethell.Entities;
 using bullethell.Entities.Bullets;
 using Godot;
 
 namespace bullethell.Emitters.Patterns;
 
-public sealed class Spiral(float startAngle, float turn, float speed, BulletStyle style) : IEmitPattern
+[GlobalClass]
+public sealed partial class Spiral : Resources.PatternResource
 {
-    private float _angle = startAngle;
+    [Export] public float StartAngle;
+    [Export] public float Turn;
+    [Export] public float Speed;
+    [Export] public required Resources.BulletStyleResource StyleResource;
 
-    public void Emit(Vector2 origin, List<Bullet> sink, in FrameContext ctx)
+    private float _angle;
+
+    public Spiral()
+        => _angle = StartAngle;
+
+    public override void Emit(Vector2 origin, List<Bullet> sink, Vector2? target = null)
     {
-        _angle += turn;
-        sink.Add(Bullet.Create(origin, Vector2.Right.Rotated(_angle) * speed, style));
+        _angle += Turn;
+        
+        sink.Add(Bullet.Create(
+            origin,
+            Vector2.Right.Rotated(_angle) * Speed,
+            StyleResource.ToStyle()));
     }
 }

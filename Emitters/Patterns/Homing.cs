@@ -1,12 +1,22 @@
 using System.Collections.Generic;
-using bullethell.Entities;
 using bullethell.Entities.Bullets;
 using Godot;
 
 namespace bullethell.Emitters.Patterns;
 
-public sealed class Homing(float speed, BulletStyle style) : IEmitPattern
+[GlobalClass]
+public sealed partial class Homing : Resources.PatternResource
 {
-    public void Emit(Vector2 origin, List<Bullet> sink, in FrameContext ctx)
-        => sink.Add(Bullet.Create(origin, (ctx.PlayerPosition - origin).Normalized() * speed, style));
+    [Export] public float Speed;
+    [Export] public required Resources.BulletStyleResource StyleResource;
+
+    public override void Emit(Vector2 origin, List<Bullet> sink, Vector2? target = null)
+    {
+        if (target is null)
+            return;
+
+        sink.Add(Bullet.Create(origin,
+            (target.Value - origin).Normalized() * Speed,
+            StyleResource.ToStyle()));
+    }
 }

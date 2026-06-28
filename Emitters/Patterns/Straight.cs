@@ -4,17 +4,18 @@ using Godot;
 
 namespace bullethell.Emitters.Patterns;
 
-public sealed partial class Ring : Resources.PatternResource
+[GlobalClass]
+public sealed partial class Straight : Resources.PatternResource
 {
-    [Export] public int Arms;
+    [Export] public float Angle;
     [Export] public float Speed;
     [Export] public required Resources.BulletStyleResource StyleResource;
-
+    
     public override void Emit(Vector2 origin, List<Bullet> sink, Vector2? target = null)
     {
-        for (var i = 0; i < Arms; i++)
-            sink.Add(Bullet.Create(origin,
-                Vector2.Right.Rotated(Mathf.Tau * i / Arms) * Speed,
-                StyleResource.ToStyle()));
+        sink.Add(Bullet.Create(
+            origin,
+            Vector2.Up.Rotated(Angle) * Speed,
+            StyleResource.ToStyle()));
     }
 }

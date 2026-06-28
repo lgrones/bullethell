@@ -6,9 +6,9 @@ public class IntervalTimer(float interval, int maxTicks = 8)
 {
     private float _elapsed;
 
-    public int Update(in FrameContext ctx)
+    public int Update(float delta)
     {
-        _elapsed += ctx.Delta;
+        _elapsed += delta;
 
         // while, not if — catch up, no dropped shots at low fps      
         var ticks = 0;                                                                                                                                            

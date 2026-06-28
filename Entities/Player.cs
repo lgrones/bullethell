@@ -1,35 +1,39 @@
 using System.Collections.Generic;
 using bullethell.Emitters;
-using bullethell.Entities.Bullets;
 using Godot;
 
 namespace bullethell.Entities;
 
-public class Player
+public partial class Player : Node2D
 {
-    private const float Speed = 280f;
-    private const float FocusSpeed = 110f;
-    private const float ShotSpeed = 900f;
-    public const float Radius = 8f;
-    public const float HitRadius = 3f;
+    [Export] public float Speed = 280f;
+    [Export] public float FocusSpeed = 110f;
+    [Export] public float Radius = 8f;
+    [Export] public float HitRadius = 3f;
 
-    public Vector2 Position;
+    private Vector2 _viewport;
+    public readonly List<BulletEmitter> Emitters = [];
 
-    private readonly PlayerShotEmitter _emitter = new(
-        interval: 0.07f,
-        speed: ShotSpeed,
-        new BulletStyle(Radius: 4f, HitRadius: 4f, Colors.White));
-
-    public void Spawn(Vector2 viewPort)
-        => Position = new Vector2(viewPort.X * 0.5f, viewPort.Y * 0.8f);
-
-    public void Update(List<PlayerShot> sink, in FrameContext ctx)
+    public override void _Ready()
     {
-        Move(in ctx);
+        _viewport = GetViewportRect().Size;
+        GetViewport().SizeChanged += () => _viewport = GetViewportRect().Size;
 
-        if (IsFiring())
-            _emitter.Update(Position + new Vector2(0, -Radius - 4f), sink, in ctx);
+        Respawn();
     }
+
+    public override void _Process(double delta)
+    {
+        Move((float)delta);
+        
+        if (Input.IsActionJustPressed("fire"))
+            Emitters.ForEach(x => x.Enable());
+        else if (Input.IsActionJustReleased("fire"))
+            Emitters.ForEach(x => x.Disable());
+    }
+
+    public void Respawn()
+        => Position = new Vector2(_viewport.X * 0.5f, _viewport.Y * 0.8f);
 
     public bool IsHit(Vector2 position, float hitRadius)
     {
@@ -43,7 +47,7 @@ public class Player
     private static bool IsFiring()
         => Input.IsActionPressed("fire");
 
-    private void Move(in FrameContext ctx)
+    private void Move(float delta)
     {
         var direction = Input.GetVector(
             "ui_left",
@@ -51,8 +55,9 @@ public class Player
             "ui_up",
             "ui_down");
 
-        Position += direction * ctx.Delta * (IsFocused() ? FocusSpeed : Speed);
-        Position.X = Mathf.Clamp(Position.X, 0, ctx.Viewport.X);
-        Position.Y = Mathf.Clamp(Position.Y, 0, ctx.Viewport.Y);
+        var pos = Position + direction * delta * (IsFocused() ? FocusSpeed : Speed);
+        pos.X = Mathf.Clamp(pos.X, Radius, _viewport.X - Radius);
+        pos.Y = Mathf.Clamp(pos.Y, Radius, _viewport.Y - Radius);
+        Position = pos;
     }
 }

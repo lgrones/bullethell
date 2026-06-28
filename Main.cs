@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using bullethell;
+using bullethell.Emitters;
 using bullethell.Entities;
 using bullethell.Entities.Bullets;
 using Godot;
@@ -11,14 +11,17 @@ public partial class Main : Node2D
 #pragma warning restore CA1050
 {
     private Vector2 _viewport;
-    private readonly Player _player = new();
-    private readonly Boss _boss = new();
     private readonly List<Bullet> _bullets = [];
-    private readonly List<PlayerShot> _playerShots = [];
+    private readonly List<Bullet> _playerShots = [];
+    private Player _player = null!;
+    private Boss _boss = null!;
     private MultiMesh _bulletMesh = null!;
 
     public override void _Ready()
     {
+        _viewport = GetViewportRect().Size;
+        GetViewport().SizeChanged += () => _viewport = GetViewportRect().Size;
+
         _bulletMesh = new MultiMesh
         {
             TransformFormat = MultiMesh.TransformFormatEnum.Transform2D,
@@ -26,42 +29,48 @@ public partial class Main : Node2D
         };
 
         GetNode<MultiMeshInstance2D>("BulletRenderer").Multimesh = _bulletMesh;
-
-        _viewport = GetViewportRect().Size;
-        GetViewport().SizeChanged += () => _viewport = GetViewportRect().Size;
-
-        _player.Spawn(_viewport);
-        _boss.Spawn(_viewport);
+        
+        _player = GetNode<Player>("Player");
+        
+        foreach (var emitter in GetTree().GetNodesInGroup("playerEmitters"))
+        {
+            if (emitter is not BulletEmitter bulletEmitter) 
+                continue;
+            
+            bulletEmitter.Disable();
+            bulletEmitter.Sink = _playerShots;
+            _player.Emitters.Add(bulletEmitter);
+        }
+        
+        _boss = GetNode<Boss>("Boss");
+        
+        foreach (var emitter in GetTree().GetNodesInGroup("bossEmitters"))
+        {
+            if (emitter is not BulletEmitter bulletEmitter) 
+                continue;
+            
+            bulletEmitter.Sink = _bullets;
+        }
     }
 
     public override void _Process(double delta)
     {
-        var ctx = new FrameContext
-        {
-            Viewport = _viewport,
-            Delta = (float)delta,
-            PlayerPosition = _player.Position
-        };
-
-        _player.Update(_playerShots, in ctx);
-        ctx = ctx with { PlayerPosition = _player.Position };
-
-        _boss.Update(_bullets, in ctx);
-
         for (var i = _bullets.Count - 1; i >= 0; i--)
         {
             var bullet = _bullets[i];
             bullet.Position += bullet.Velocity * (float)delta;
             _bullets[i] = bullet;
 
-            if (_player.IsHit(bullet.Position, bullet.Style.HitRadius))
+            var isHit = _player.IsHit(bullet.Position, bullet.Style.HitRadius);
+
+            if (!isHit && bullet.IsInBounds(_viewport))
+                continue;
+
+            if (isHit)
             {
                 Reset();
                 break;
             }
-
-            if (bullet.IsInBounds(_viewport))
-                continue;
 
             Cull(_bullets, i);
         }
@@ -85,7 +94,7 @@ public partial class Main : Node2D
 
             Cull(_playerShots, i);
         }
-        
+
         _bulletMesh.InstanceCount = _bullets.Count;
 
         for (var i = 0; i < _bullets.Count; i++)
@@ -98,16 +107,16 @@ public partial class Main : Node2D
 
     public override void _Draw()
     {
-        DrawCircle(_player.Position, Player.Radius, Colors.White);
+        DrawCircle(_player.Position, _player.Radius, Colors.White);
 
         if (Player.IsFocused())
-            DrawCircle(_player.Position, Player.HitRadius, Colors.Red);
+            DrawCircle(_player.Position, _player.HitRadius, Colors.Red);
 
-        DrawCircle(_boss.Position, Boss.Radius, Colors.GreenYellow);
+        DrawCircle(_boss.Position, _boss.Radius, Colors.GreenYellow);
 
         foreach (var playerShot in _playerShots)
         {
-            DrawCircle(playerShot.Position, playerShot.Style.Radius, playerShot.Style.Color);
+            DrawCircle(playerShot.Position, playerShot.Style.Radius, Colors.White);
         }
     }
 
@@ -121,7 +130,7 @@ public partial class Main : Node2D
     {
         _bullets.Clear();
         _playerShots.Clear();
-        _player.Spawn(_viewport);
+        _player.Respawn();
         _boss.Hp = 10;
     }
 }

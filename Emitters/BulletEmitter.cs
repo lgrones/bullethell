@@ -1,20 +1,50 @@
+using System;
 using System.Collections.Generic;
 using bullethell.Emitters.Patterns;
 using bullethell.Entities.Bullets;
 using bullethell.Timers;
 using Godot;
+using PatternResource = bullethell.Emitters.Resources.PatternResource;
 
 namespace bullethell.Emitters;
 
-public sealed class BulletEmitter(float interval, IEmitPattern pattern)
+public sealed partial class BulletEmitter : Node2D
 {
-    private readonly IntervalTimer _timer = new(interval);
+    [Export] public float Interval;
+    [Export] public PatternResource? Pattern;
+    [Export] public Node2D? Target;
 
-    public void Update(Vector2 origin, List<Bullet> sink, in FrameContext ctx)
-    {                                                                                                                                                                 
-        var ticks = _timer.Update(in ctx);      
-        
-        while(ticks-- > 0)                                                                                                                             
-            pattern.Emit(origin, sink, in ctx);                                                                                                                       
-    }  
+    public List<Bullet>? Sink;
+    private bool _enabled = true;
+
+    private IntervalTimer _timer = null!;
+
+    public override void _Ready()
+    {
+        _timer = new IntervalTimer(Interval);
+    }
+
+    public override void _Process(double delta)
+    {
+        if (!_enabled)
+            return;
+
+        if (Sink is null)
+            throw new InvalidOperationException($"{nameof(BulletEmitter)} requires {nameof(Sink)} before processing.");
+
+        if (Pattern is null)
+            throw new InvalidOperationException(
+                $"{nameof(BulletEmitter)} requires {nameof(Pattern)} before processing.");
+
+        var ticks = _timer.Update((float)delta);
+
+        while (ticks-- > 0)
+            Pattern.Emit(GlobalPosition, Sink, Target?.GlobalPosition);
+    }
+
+    public void Enable()
+        => _enabled = true;
+    
+    public void Disable()
+        => _enabled = false;
 }
