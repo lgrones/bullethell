@@ -1,16 +1,17 @@
 using System.Collections.Generic;
+using bullethell.Emitters.Resources;
 using bullethell.Entities.Bullets;
 using Godot;
 
 namespace bullethell.Emitters.Patterns;
 
 [GlobalClass]
-public sealed partial class Spiral : Resources.PatternResource
+public sealed partial class Spiral : PatternResource
 {
     [Export] public float StartAngle;
     [Export] public float Turn;
     [Export] public float Speed;
-    [Export] public required Resources.BulletStyleResource StyleResource;
+    [Export] public required BulletStyleResource StyleResource;
 
     private float _angle;
 

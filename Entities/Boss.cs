@@ -1,24 +1,67 @@
+using System.Collections.Generic;
+using bullethell.Entities.Bullets;
 using Godot;
+using Timer = bullethell.Timers.Timer;
 
-// ReSharper disable once CheckNamespace
-#pragma warning disable CA1050
+namespace bullethell.Entities;
+
 public partial class Boss : Node2D
-#pragma warning restore CA1050
 {
     [Export] public float Radius = 8f;
     [Export] public float HitRadius = 10f;
+    [Export] public Phase[] Phases = [];
 
-    public int Hp = 10;
+    public List<Bullet> Sink = [];
+
+    private int _currentPhase;
+    private uint _currentHp;
+    private Timer _phaseTimer = null!;
 
     public override void _Ready()
     {
         var viewPort = GetViewportRect().Size;
         Position = new Vector2(viewPort.X * 0.5f, viewPort.Y * 0.15f);
+
+        EnablePhase();
     }
-    
-    public bool IsHit(Vector2 position, float hitRadius)
+
+    public override void _Process(double delta)
+    {
+        if (_currentPhase == Phases.Length)
+            return;
+
+        if (_currentHp == 0 || _phaseTimer.IsElapsed)
+            NextPhase();
+    }
+
+    public bool CheckHit(Vector2 position, float hitRadius)
     {
         var r = HitRadius + hitRadius;
-        return Position.DistanceSquaredTo(position) < r * r;
+        var isHit = Position.DistanceSquaredTo(position) < r * r;
+
+        if (isHit && _currentHp > 0)
+            _currentHp--;
+
+        return isHit;
+    }
+
+    private void NextPhase()
+    {
+        Phases[_currentPhase].ProcessMode = ProcessModeEnum.Disabled;
+        Sink.Clear();
+
+        _currentPhase++;
+
+        if (_currentPhase == Phases.Length)
+            return;
+
+        EnablePhase();
+    }
+
+    private void EnablePhase()
+    {
+        _phaseTimer = new Timer(Phases[_currentPhase].Duration);
+        _currentHp = Phases[_currentPhase].Hp;
+        Phases[_currentPhase].ProcessMode = ProcessModeEnum.Inherit;
     }
 }

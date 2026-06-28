@@ -4,6 +4,7 @@
 [ext_resource type="Shader" uid="uid://dt2wk80euv4f2" path="res://Entities/bullet.gdshader" id="2_0xm2m"]
 [ext_resource type="Script" uid="uid://clqyk3nrh0can" path="res://Entities/Boss.cs" id="3_lquwl"]
 [ext_resource type="Script" uid="uid://dlokb3krq7k2u" path="res://Emitters/BulletEmitter.cs" id="4_7mycd"]
+[ext_resource type="Script" uid="uid://58dian6werok" path="res://Entities/Phase.cs" id="4_kek77"]
 [ext_resource type="Resource" uid="uid://dfk6x6nkkqtnq" path="res://Resources/Patterns/spiral.tres" id="5_272bh"]
 [ext_resource type="Resource" uid="uid://c6hss3xaf2l4g" path="res://Resources/Patterns/homing.tres" id="6_5vw27"]
 [ext_resource type="Script" uid="uid://bjon0sreg8b64" path="res://Entities/Player.cs" id="6_7mycd"]
@@ -18,19 +19,46 @@ script = ExtResource("1_ig7tw")
 [node name="BulletRenderer" type="MultiMeshInstance2D" parent="." unique_id=1672732280]
 material = SubResource("ShaderMaterial_ig7tw")
 
-[node name="Boss" type="Node2D" parent="." unique_id=195315039]
+[node name="Boss" type="Node2D" parent="." unique_id=195315039 node_paths=PackedStringArray("Phases")]
 script = ExtResource("3_lquwl")
+Phases = [NodePath("Phase 1"), NodePath("Phase 2")]
 
-[node name="SpiralEmitter" type="Node2D" parent="Boss" unique_id=1867173512 groups=["bossEmitters"]]
+[node name="Phase 1" type="Node2D" parent="Boss" unique_id=1297854430 node_paths=PackedStringArray("Emitters")]
+script = ExtResource("4_kek77")
+Duration = 10.0
+Hp = 10
+Emitters = [NodePath("SpiralEmitter"), NodePath("HomingEmitter")]
+
+[node name="SpiralEmitter" type="Node2D" parent="Boss/Phase 1" unique_id=1867173512 groups=["bossEmitters"]]
 script = ExtResource("4_7mycd")
 Interval = 0.3
 Pattern = ExtResource("5_272bh")
 
-[node name="HomingEmitter" type="Node2D" parent="Boss" unique_id=1728547252 node_paths=PackedStringArray("Target") groups=["bossEmitters"]]
+[node name="HomingEmitter" type="Node2D" parent="Boss/Phase 1" unique_id=1728547252 node_paths=PackedStringArray("Target") groups=["bossEmitters"]]
 script = ExtResource("4_7mycd")
 Interval = 0.5
 Pattern = ExtResource("6_5vw27")
-Target = NodePath("../../Player")
+Target = NodePath("../../../Player")
+
+[node name="Phase 2" type="Node2D" parent="Boss" unique_id=630382620 node_paths=PackedStringArray("Emitters")]
+script = ExtResource("4_kek77")
+Duration = 20.0
+Hp = 20
+Emitters = [NodePath("HomingEmitter"), NodePath("HomingEmitter2")]
+
+[node name="HomingEmitter" type="Node2D" parent="Boss/Phase 2" unique_id=916013792 node_paths=PackedStringArray("Target") groups=["bossEmitters"]]
+position = Vector2(-20, 0)
+script = ExtResource("4_7mycd")
+Interval = 0.5
+Pattern = ExtResource("6_5vw27")
+Target = NodePath("../../../Player")
+
+[node name="HomingEmitter2" type="Node2D" parent="Boss/Phase 2" unique_id=517614158 node_paths=PackedStringArray("Target") groups=["bossEmitters"]]
+position = Vector2(20, 0)
+script = ExtResource("4_7mycd")
+Interval = 0.3
+Pattern = ExtResource("6_5vw27")
+Target = NodePath("../../../Player")
 
 [node name="Player" type="Node2D" parent="." unique_id=2093934826]
 script = ExtResource("6_7mycd")

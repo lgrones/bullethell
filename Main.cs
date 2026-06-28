@@ -31,6 +31,9 @@ public partial class Main : Node2D
         GetNode<MultiMeshInstance2D>("BulletRenderer").Multimesh = _bulletMesh;
         
         _player = GetNode<Player>("Player");
+        _boss = GetNode<Boss>("Boss");
+
+        _boss.Sink = _bullets;
         
         foreach (var emitter in GetTree().GetNodesInGroup("playerEmitters"))
         {
@@ -41,8 +44,6 @@ public partial class Main : Node2D
             bulletEmitter.Sink = _playerShots;
             _player.Emitters.Add(bulletEmitter);
         }
-        
-        _boss = GetNode<Boss>("Boss");
         
         foreach (var emitter in GetTree().GetNodesInGroup("bossEmitters"))
         {
@@ -81,16 +82,10 @@ public partial class Main : Node2D
             bullet.Position += bullet.Velocity * (float)delta;
             _playerShots[i] = bullet;
 
-            var isHit = _boss.IsHit(bullet.Position, bullet.Style.HitRadius);
+            var isHit = _boss.CheckHit(bullet.Position, bullet.Style.HitRadius);
 
             if (!isHit && bullet.IsInBounds(_viewport))
                 continue;
-
-            if (isHit && --_boss.Hp <= 0)
-            {
-                Reset();
-                break;
-            }
 
             Cull(_playerShots, i);
         }
@@ -131,6 +126,5 @@ public partial class Main : Node2D
         _bullets.Clear();
         _playerShots.Clear();
         _player.Respawn();
-        _boss.Hp = 10;
     }
 }

@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using bullethell.Emitters.Patterns;
+using bullethell.Emitters.Resources;
 using bullethell.Entities.Bullets;
 using bullethell.Timers;
 using Godot;
-using PatternResource = bullethell.Emitters.Resources.PatternResource;
 
 namespace bullethell.Emitters;
 
@@ -22,6 +21,10 @@ public sealed partial class BulletEmitter : Node2D
     public override void _Ready()
     {
         _timer = new IntervalTimer(Interval);
+        
+        if (Pattern is null)
+            throw new InvalidOperationException(
+                $"{nameof(BulletEmitter)} requires {nameof(Pattern)} before processing.");
     }
 
     public override void _Process(double delta)
@@ -31,15 +34,11 @@ public sealed partial class BulletEmitter : Node2D
 
         if (Sink is null)
             throw new InvalidOperationException($"{nameof(BulletEmitter)} requires {nameof(Sink)} before processing.");
-
-        if (Pattern is null)
-            throw new InvalidOperationException(
-                $"{nameof(BulletEmitter)} requires {nameof(Pattern)} before processing.");
-
+        
         var ticks = _timer.Update((float)delta);
 
         while (ticks-- > 0)
-            Pattern.Emit(GlobalPosition, Sink, Target?.GlobalPosition);
+            Pattern!.Emit(GlobalPosition, Sink, Target?.GlobalPosition);
     }
 
     public void Enable()
