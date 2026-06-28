@@ -5,6 +5,8 @@ using Godot;
 
 namespace bullethell.Emitters.Patterns;
 
+[Tool]
+[GlobalClass]
 public sealed partial class Ring : PatternResource
 {
     [Export] public int Arms;

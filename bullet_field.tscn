@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://bswteemawxgoy"]
+
+[ext_resource type="Script" uid="uid://bobgiq1h8psuq" path="res://BulletField.cs" id="1_bmkvs"]
+[ext_resource type="Shader" uid="uid://dt2wk80euv4f2" path="res://Resources/Shaders/bullet.gdshader" id="2_i85sv"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ig7tw"]
+shader = ExtResource("2_i85sv")
+
+[sub_resource type="QuadMesh" id="QuadMesh_qc6od"]
+size = Vector2(20, 20)
+
+[sub_resource type="MultiMesh" id="MultiMesh_5dalj"]
+mesh = SubResource("QuadMesh_qc6od")
+
+[node name="BulletField" type="Node2D" unique_id=2001126864]
+script = ExtResource("1_bmkvs")
+PlayArea = Vector2(960, 540)
+
+[node name="BulletRenderer" type="MultiMeshInstance2D" parent="." unique_id=395819944]
+material = SubResource("ShaderMaterial_ig7tw")
+multimesh = SubResource("MultiMesh_5dalj")

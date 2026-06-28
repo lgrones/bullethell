@@ -5,35 +5,34 @@ using bullethell.Entities;
 using bullethell.Entities.Bullets;
 using Godot;
 
-// ReSharper disable once CheckNamespace
-#pragma warning disable CA1050
+namespace bullethell;
+
 public partial class Main : Node2D
-#pragma warning restore CA1050
 {
     private Vector2 _viewport;
-    private readonly List<Bullet> _bullets = [];
     private readonly List<Bullet> _playerShots = [];
-    private Player _player = null!;
     private Boss _boss = null!;
-    private MultiMesh _bulletMesh = null!;
+    private Player _player = null!;
+    private BulletField _field = null!;
 
     public override void _Ready()
     {
         _viewport = GetViewportRect().Size;
-        GetViewport().SizeChanged += () => _viewport = GetViewportRect().Size;
-
-        _bulletMesh = new MultiMesh
+        GetViewport().SizeChanged += () =>
         {
-            TransformFormat = MultiMesh.TransformFormatEnum.Transform2D,
-            Mesh = new QuadMesh { Size = new Vector2(20, 20) }
+            _viewport = GetViewportRect().Size;
+            _field.PlayArea = _viewport;
         };
 
-        GetNode<MultiMeshInstance2D>("BulletRenderer").Multimesh = _bulletMesh;
+        _field = GetNode<BulletField>("BulletField");
         
         _player = GetNode<Player>("Player");
         _boss = GetNode<Boss>("Boss");
 
-        _boss.Sink = _bullets;
+        _field.PlayArea = _viewport;
+        _field.Target = _player;
+        _field.TargetHit += Reset;
+        _boss.Field = _field.Bullets;
         
         foreach (var emitter in GetTree().GetNodesInGroup("playerEmitters"))
         {
@@ -50,51 +49,22 @@ public partial class Main : Node2D
             if (emitter is not BulletEmitter bulletEmitter) 
                 continue;
             
-            bulletEmitter.Sink = _bullets;
+            bulletEmitter.Sink = _field.Bullets;
         }
     }
 
     public override void _Process(double delta)
     {
-        for (var i = _bullets.Count - 1; i >= 0; i--)
-        {
-            var bullet = _bullets[i];
-            bullet.Position += bullet.Velocity * (float)delta;
-            _bullets[i] = bullet;
-
-            var isHit = _player.IsHit(bullet.Position, bullet.Style.HitRadius);
-
-            if (!isHit && bullet.IsInBounds(_viewport))
-                continue;
-
-            if (isHit)
-            {
-                Reset();
-                break;
-            }
-
-            Cull(_bullets, i);
-        }
-
         for (var i = _playerShots.Count - 1; i >= 0; i--)
         {
             var bullet = _playerShots[i];
             bullet.Position += bullet.Velocity * (float)delta;
             _playerShots[i] = bullet;
-
-            var isHit = _boss.CheckHit(bullet.Position, bullet.Style.HitRadius);
-
-            if (!isHit && bullet.IsInBounds(_viewport))
+            
+            if (!_boss.IsHitBy(bullet.Position, bullet.Style.HitRadius) && bullet.IsInBounds(_viewport))
                 continue;
 
             Cull(_playerShots, i);
-        }
-
-        _bulletMesh.InstanceCount = _bullets.Count;
-
-        for (var i = 0; i < _bullets.Count; i++)
-        {
-            _bulletMesh.SetInstanceTransform2D(i, new Transform2D(0f, _bullets[i].Position));
         }
 
         QueueRedraw();
@@ -102,13 +72,6 @@ public partial class Main : Node2D
 
     public override void _Draw()
     {
-        DrawCircle(_player.Position, _player.Radius, Colors.White);
-
-        if (Player.IsFocused())
-            DrawCircle(_player.Position, _player.HitRadius, Colors.Red);
-
-        DrawCircle(_boss.Position, _boss.Radius, Colors.GreenYellow);
-
         foreach (var playerShot in _playerShots)
         {
             DrawCircle(playerShot.Position, playerShot.Style.Radius, Colors.White);
@@ -123,7 +86,7 @@ public partial class Main : Node2D
 
     private void Reset()
     {
-        _bullets.Clear();
+        _field.Bullets.Clear();
         _playerShots.Clear();
         _player.Respawn();
     }

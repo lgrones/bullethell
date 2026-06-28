@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://dph6wy10nv5h8"]
+
+[ext_resource type="Script" uid="uid://cdr8dgrdhvbyt" path="res://PreviewMain.cs" id="1_2gyu8"]
+[ext_resource type="PackedScene" uid="uid://bswteemawxgoy" path="res://bullet_field.tscn" id="2_1esjh"]
+[ext_resource type="Script" uid="uid://dlokb3krq7k2u" path="res://Emitters/BulletEmitter.cs" id="3_n3s36"]
+[ext_resource type="Resource" uid="uid://dfk6x6nkkqtnq" path="res://Resources/Patterns/spiral.tres" id="4_n3s36"]
+
+[node name="PreviewMain" type="Node2D" unique_id=1936638775]
+script = ExtResource("1_2gyu8")
+
+[node name="BulletField" parent="." unique_id=2001126864 instance=ExtResource("2_1esjh")]
+
+[node name="Emitter" type="Node2D" parent="." unique_id=1509211687]
+unique_name_in_owner = true
+position = Vector2(438, 248)
+script = ExtResource("3_n3s36")
+Pattern = ExtResource("4_n3s36")
+Interval = 0.2

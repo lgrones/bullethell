@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("1_qhei4")
-Turn = 0.3
-Speed = 120.0
+Turn = 0.275
+Speed = 260.0
 StyleResource = ExtResource("1_e4t4l")
 metadata/_custom_type_script = "uid://f82uw8d71p0c"

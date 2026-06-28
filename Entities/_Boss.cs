@@ -59,7 +59,7 @@
 //             emitter.Update(Position, sink, in ctx);
 //     }
 //     
-//     public bool IsHit(Vector2 position, float hitRadius)
+//     public bool IsHitBy(Vector2 position, float hitRadius)
 //     {
 //         var r = HitRadius + hitRadius;
 //         return Position.DistanceSquaredTo(position) < r * r;

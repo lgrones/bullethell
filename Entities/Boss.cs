@@ -5,13 +5,13 @@ using Timer = bullethell.Timers.Timer;
 
 namespace bullethell.Entities;
 
-public partial class Boss : Node2D
+public partial class Boss : Node2D, ICollidable
 {
     [Export] public float Radius = 8f;
-    [Export] public float HitRadius = 10f;
+    [Export] public float HitRadius { get; set; } = 10f;
     [Export] public Phase[] Phases = [];
 
-    public List<Bullet> Sink = [];
+    public List<Bullet> Field = [];
 
     private int _currentPhase;
     private uint _currentHp;
@@ -29,15 +29,21 @@ public partial class Boss : Node2D
     {
         if (_currentPhase == Phases.Length)
             return;
+        
+        _phaseTimer.Update((float)delta);
 
         if (_currentHp == 0 || _phaseTimer.IsElapsed)
             NextPhase();
     }
 
-    public bool CheckHit(Vector2 position, float hitRadius)
+    public override void _Draw()
     {
-        var r = HitRadius + hitRadius;
-        var isHit = Position.DistanceSquaredTo(position) < r * r;
+        DrawCircle(Vector2.Zero, Radius, Colors.GreenYellow);
+    }
+
+    public bool IsHitBy(Vector2 position, float hitRadius)
+    {
+        var isHit = ICollidable.Overlaps(Position, hitRadius, position, hitRadius);
 
         if (isHit && _currentHp > 0)
             _currentHp--;
@@ -48,7 +54,7 @@ public partial class Boss : Node2D
     private void NextPhase()
     {
         Phases[_currentPhase].ProcessMode = ProcessModeEnum.Disabled;
-        Sink.Clear();
+        Field.Clear();
 
         _currentPhase++;
 

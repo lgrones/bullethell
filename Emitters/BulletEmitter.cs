@@ -7,24 +7,32 @@ using Godot;
 
 namespace bullethell.Emitters;
 
+[Tool]
 public sealed partial class BulletEmitter : Node2D
 {
-    [Export] public float Interval;
     [Export] public PatternResource? Pattern;
     [Export] public Node2D? Target;
 
+    [Export]
+    public float Interval
+    {
+        get => _interval;
+        set
+        {
+            _interval = value;
+            _timer?.SetInterval(value);
+        }
+    }
+
     public List<Bullet>? Sink;
+    private float _interval;
     private bool _enabled = true;
 
-    private IntervalTimer _timer = null!;
+    private IntervalTimer? _timer;
 
     public override void _Ready()
     {
         _timer = new IntervalTimer(Interval);
-        
-        if (Pattern is null)
-            throw new InvalidOperationException(
-                $"{nameof(BulletEmitter)} requires {nameof(Pattern)} before processing.");
     }
 
     public override void _Process(double delta)
@@ -32,18 +40,21 @@ public sealed partial class BulletEmitter : Node2D
         if (!_enabled)
             return;
 
-        if (Sink is null)
-            throw new InvalidOperationException($"{nameof(BulletEmitter)} requires {nameof(Sink)} before processing.");
-        
-        var ticks = _timer.Update((float)delta);
+        if (Pattern is null || Sink is null)
+        {
+            if (Engine.IsEditorHint()) return;
+            throw new InvalidOperationException("Emitter not wired");
+        }
+
+        var ticks = _timer?.Update((float)delta);
 
         while (ticks-- > 0)
-            Pattern!.Emit(GlobalPosition, Sink, Target?.GlobalPosition);
+            Pattern.Emit(GlobalPosition, Sink, Target?.GlobalPosition);
     }
 
     public void Enable()
         => _enabled = true;
-    
+
     public void Disable()
         => _enabled = false;
 }

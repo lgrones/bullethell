@@ -4,12 +4,12 @@ using Godot;
 
 namespace bullethell.Entities;
 
-public partial class Player : Node2D
+public partial class Player : Node2D, ICollidable
 {
     [Export] public float Speed = 280f;
     [Export] public float FocusSpeed = 110f;
     [Export] public float Radius = 8f;
-    [Export] public float HitRadius = 3f;
+    [Export] public float HitRadius { get; set; } = 3f;
 
     private Vector2 _viewport;
     public readonly List<BulletEmitter> Emitters = [];
@@ -25,11 +25,21 @@ public partial class Player : Node2D
     public override void _Process(double delta)
     {
         Move((float)delta);
-        
+
         if (Input.IsActionJustPressed("fire"))
             Emitters.ForEach(x => x.Enable());
         else if (Input.IsActionJustReleased("fire"))
             Emitters.ForEach(x => x.Disable());
+
+        QueueRedraw();
+    }
+
+    public override void _Draw()
+    {
+        DrawCircle(Vector2.Zero, Radius, Colors.White);
+
+        if (IsFocused())
+            DrawCircle(Vector2.Zero, HitRadius, Colors.Red);
     }
 
     public void Respawn()
@@ -41,7 +51,7 @@ public partial class Player : Node2D
         return Position.DistanceSquaredTo(position) < r * r;
     }
 
-    public static bool IsFocused()
+    private static bool IsFocused()
         => Input.IsActionPressed("focus");
 
     private static bool IsFiring()

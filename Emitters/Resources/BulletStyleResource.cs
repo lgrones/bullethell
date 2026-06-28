@@ -3,6 +3,7 @@ using Godot;
 
 namespace bullethell.Emitters.Resources;
 
+[Tool]
 [GlobalClass]
 public partial class BulletStyleResource : Resource
 {
