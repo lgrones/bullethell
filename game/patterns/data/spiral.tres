@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Spiral" format=3 uid="uid://dfk6x6nkkqtnq"]
+
+[ext_resource type="Resource" uid="uid://cuqjphkesceh6" path="res://game/bullets/behaviors/data/pink-orb.tres" id="1_e4t4l"]
+[ext_resource type="Script" uid="uid://f82uw8d71p0c" path="res://game/patterns/leaves/Spiral.cs" id="1_qhei4"]
+
+[resource]
+script = ExtResource("1_qhei4")
+Turn = 0.275
+Speed = 260.0
+StyleResource = ExtResource("1_e4t4l")
+metadata/_custom_type_script = "uid://f82uw8d71p0c"

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="BulletStyleResource" format=3 uid="uid://cuqjphkesceh6"]
+
+[ext_resource type="Script" uid="uid://ck6c070qu78do" path="res://game/bullets/behaviors/BulletStyleResource.cs" id="1_xqw2c"]
+
+[resource]
+script = ExtResource("1_xqw2c")
+Radius = 6.0
+HitRadius = 6.0
+metadata/_custom_type_script = "uid://ck6c070qu78do"

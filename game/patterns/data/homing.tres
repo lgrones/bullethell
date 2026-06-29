@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Homing" format=3 uid="uid://c6hss3xaf2l4g"]
+
+[ext_resource type="Resource" uid="uid://cuqjphkesceh6" path="res://game/bullets/behaviors/data/pink-orb.tres" id="1_bdpr7"]
+[ext_resource type="Script" uid="uid://b2yus8uq8p8xv" path="res://game/patterns/leaves/Homing.cs" id="1_ds6ld"]
+
+[resource]
+script = ExtResource("1_ds6ld")
+Speed = 200.0
+StyleResource = ExtResource("1_bdpr7")
+metadata/_custom_type_script = "uid://b2yus8uq8p8xv"

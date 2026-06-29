@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://2gycfvpavqnw"]
+
+[ext_resource type="Script" uid="uid://dg1otn2jcvxmu" path="res://main/Main.cs" id="1_bsumw"]
+[ext_resource type="PackedScene" uid="uid://bswteemawxgoy" path="res://game/bullets/bullet_field.tscn" id="2_fwcvl"]
+[ext_resource type="Script" uid="uid://clqyk3nrh0can" path="res://game/actors/enemies/Boss.cs" id="3_na0o7"]
+[ext_resource type="Script" uid="uid://dlokb3krq7k2u" path="res://game/emitters/BulletEmitter.cs" id="5_5xyti"]
+[ext_resource type="Script" uid="uid://bjon0sreg8b64" path="res://game/actors/Player.cs" id="10_q0sk7"]
+
+[node name="Main" type="Node2D" unique_id=1279899591]
+script = ExtResource("1_bsumw")
+
+[node name="BulletField" parent="." unique_id=2001126864 instance=ExtResource("2_fwcvl")]
+
+[node name="Boss" type="Node2D" parent="." unique_id=195315039 node_paths=PackedStringArray("Phases")]
+script = ExtResource("3_na0o7")
+Phases = [NodePath(""), NodePath("")]
+
+[node name="Player" type="Node2D" parent="." unique_id=2093934826]
+script = ExtResource("10_q0sk7")
+
+[node name="ShotEmitter" type="Node2D" parent="Player" unique_id=284822326 groups=["playerEmitters"]]
+script = ExtResource("5_5xyti")
