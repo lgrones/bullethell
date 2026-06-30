@@ -2,6 +2,8 @@ using Godot;
 
 namespace bullethell.game.emitters.cadences;
 
+[Tool]
+[GlobalClass]
 public partial class BurstCadence : Cadence
 {
     [Export] public int ShotsPerBurst = 5;

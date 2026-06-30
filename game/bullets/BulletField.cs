@@ -154,6 +154,6 @@ public sealed partial class BulletField : Node2D, IBulletSink
         var span = CollectionsMarshal.AsSpan(_pool);
 
         for (var i = 0; i < span.Length; i++)
-            _mesh.SetInstanceTransform2D(i, new Transform2D(0f, span[i].Position));
+            _mesh.SetInstanceTransform2D(i, new Transform2D(span[i].Velocity.Angle(), span[i].Position));
     }
 }

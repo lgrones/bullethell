@@ -2,6 +2,8 @@ using Godot;
 
 namespace bullethell.game.emitters.cadences;
 
+[Tool]
+[GlobalClass]
 public partial class CurveCadence : Cadence
 {
     [Export] public Curve RatePerSecond = new();     
