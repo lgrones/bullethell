@@ -1,21 +1,13 @@
 shader_type canvas_item;
 
-void vertex() {
-	// Called for every vertex the material is visible on.
-}
+// NOTE: per-bullet atlas region is unsolved — 2D MultiMesh INSTANCE_CUSTOM
+// aliases the instance color, so per-instance UV regions don't work yet.
+// Hardcoded to the white star cell for now so the preview renders clean.
+// Next: per-style MultiMesh + AtlasTexture instead (see memory notes).
+uniform sampler2D atlas : source_color, filter_linear;
 
 void fragment() {
-	// UV is 0..1 across the quad; center is (0.5, 0.5)
-    float dist = distance(UV, vec2(0.5));
-    // glow falls off from center: bright at 0, dark at edge
-    float glow = smoothstep(0.5, 0.0, dist);
-    vec3 core = vec3(1.0);              // white core
-    vec3 halo = vec3(1.0, 0.4, 0.5);    // blue halo
-    vec3 color = mix(halo, core, glow * glow);
-    COLOR = vec4(color, glow);          // alpha = glow → transparent edges
+	vec2 atlas_size = vec2(1408.0, 1152.0);
+	vec2 uv = vec2(609.0, 33.0) / atlas_size + UV * (vec2(30.0, 30.0) / atlas_size);
+	COLOR = texture(atlas, uv);
 }
-
-//void light() {
-//	// Called for every pixel for every light affecting the CanvasItem.
-//	// Uncomment to replace the default light processing function with this one.
-//}

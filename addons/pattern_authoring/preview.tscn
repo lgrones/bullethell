@@ -2,58 +2,106 @@
 
 [ext_resource type="Script" uid="uid://cdr8dgrdhvbyt" path="res://addons/pattern_authoring/PreviewMain.cs" id="1_aad4j"]
 [ext_resource type="PackedScene" uid="uid://bswteemawxgoy" path="res://game/bullets/bullet_field.tscn" id="2_uvo3e"]
-[ext_resource type="Script" uid="uid://yvnadlq43i7y" path="res://game/patterns/FrameModifier.cs" id="3_btxyo"]
 [ext_resource type="Script" uid="uid://ds52o3ol62flm" path="res://game/patterns/shots/StraightShot.cs" id="3_eepdp"]
 [ext_resource type="Script" uid="uid://dlokb3krq7k2u" path="res://game/emitters/BulletEmitter.cs" id="3_mwv1k"]
-[ext_resource type="Script" uid="uid://b2qg412v5bcq4" path="res://game/patterns/modifiers/Ring.cs" id="4_g8rhh"]
+[ext_resource type="Script" uid="uid://ck6c070qu78do" path="res://game/bullets/behaviors/BulletStyleResource.cs" id="3_pyg58"]
 [ext_resource type="Script" uid="uid://c6bir11fkxpde" path="res://game/emitters/cadences/LinearCadence.cs" id="4_pyg58"]
-[ext_resource type="Script" uid="uid://cetiaiebnmo30" path="res://game/bullets/behaviors/BulletState.cs" id="5_h7uuo"]
-[ext_resource type="Script" uid="uid://bumoxb5pkjtrh" path="res://game/bullets/behaviors/BulletBehavior.cs" id="6_gh0jr"]
-[ext_resource type="Script" uid="uid://dbuei2gfylcvv" path="res://game/patterns/Composite.cs" id="6_h7uuo"]
+[ext_resource type="Script" uid="uid://dte8y7ebm5fwc" path="res://game/emitters/EmitterAnchor.cs" id="5_anchr"]
 
-[sub_resource type="Resource" id="Resource_btxyo"]
-script = ExtResource("4_g8rhh")
-Count = 8
-metadata/_custom_type_script = "uid://b2qg412v5bcq4"
+[sub_resource type="Resource" id="Resource_13p55"]
+script = ExtResource("3_pyg58")
+Rainbow = true
+Region = Rect2(609, 33, 30, 30)
+Rotation = 2
+metadata/_custom_type_script = "uid://ck6c070qu78do"
 
-[sub_resource type="Resource" id="Resource_5dalj"]
-script = ExtResource("5_h7uuo")
-Exit = 1
-ExitThreshold = 2.0
-OnEnd = 1
-metadata/_custom_type_script = "uid://cetiaiebnmo30"
-
-[sub_resource type="Resource" id="Resource_gh0jr"]
-script = ExtResource("6_gh0jr")
-States = Array[ExtResource("5_h7uuo")]([SubResource("Resource_5dalj")])
-metadata/_custom_type_script = "uid://bumoxb5pkjtrh"
-
-[sub_resource type="Resource" id="Resource_h7uuo"]
+[sub_resource type="Resource" id="Resource_u0qgi"]
 script = ExtResource("3_eepdp")
-Behavior = SubResource("Resource_gh0jr")
+Style = SubResource("Resource_13p55")
+Speed = 100.0
 metadata/_custom_type_script = "uid://ds52o3ol62flm"
 
-[sub_resource type="Resource" id="Resource_eepdp"]
-script = ExtResource("6_h7uuo")
-Source = SubResource("Resource_h7uuo")
-Modifiers = Array[ExtResource("3_btxyo")]([SubResource("Resource_btxyo")])
-metadata/_custom_type_script = "uid://dbuei2gfylcvv"
-
-[sub_resource type="Resource" id="Resource_uaugh"]
+[sub_resource type="Resource" id="Resource_5c6eh"]
 script = ExtResource("4_pyg58")
-ShotInterval = 0.1
+ShotInterval = 0.07
+metadata/_custom_type_script = "uid://c6bir11fkxpde"
+
+[sub_resource type="Resource" id="Resource_g8rhh"]
+script = ExtResource("4_pyg58")
+ShotInterval = 0.05
+metadata/_custom_type_script = "uid://c6bir11fkxpde"
+
+[sub_resource type="Resource" id="Resource_h7uuo"]
+script = ExtResource("4_pyg58")
+ShotInterval = 0.07
+metadata/_custom_type_script = "uid://c6bir11fkxpde"
+
+[sub_resource type="Resource" id="Resource_gh0jr"]
+script = ExtResource("4_pyg58")
+ShotInterval = 0.06
+metadata/_custom_type_script = "uid://c6bir11fkxpde"
+
+[sub_resource type="Resource" id="Resource_cshfi"]
+script = ExtResource("4_pyg58")
+ShotInterval = 0.04
 metadata/_custom_type_script = "uid://c6bir11fkxpde"
 
 [node name="PreviewMain" type="Node2D" unique_id=1936638775]
 script = ExtResource("1_aad4j")
 
-[node name="Emitter" type="Node2D" parent="." unique_id=1509211687]
-unique_name_in_owner = true
-position = Vector2(757, 455)
-rotation = -1.5707964
+[node name="EmitterAnchor" type="Node2D" parent="." unique_id=1509211688]
+position = Vector2(574.00006, 192.00003)
+rotation = 0.9689254
+script = ExtResource("5_anchr")
+RotationSpeed = 100.0
+
+[node name="InnerAnchor" type="Node2D" parent="EmitterAnchor" unique_id=1957118244]
+position = Vector2(0, -160)
+rotation = 5.791236
+scale = Vector2(1.0000001, 1.0000001)
+script = ExtResource("5_anchr")
+RotationSpeed = 80.0
+
+[node name="Emitter" type="Node2D" parent="EmitterAnchor/InnerAnchor" unique_id=1509211687]
+scale = Vector2(0.9999999, 0.9999999)
 script = ExtResource("3_mwv1k")
-Pattern = SubResource("Resource_eepdp")
-Cadence = SubResource("Resource_uaugh")
+Pattern = SubResource("Resource_u0qgi")
+Cadence = SubResource("Resource_5c6eh")
+
+[node name="Emitter2" type="Node2D" parent="EmitterAnchor" unique_id=187952956]
+position = Vector2(152.2, -49.4)
+rotation = 1.2566371
+script = ExtResource("3_mwv1k")
+Pattern = SubResource("Resource_u0qgi")
+Cadence = SubResource("Resource_g8rhh")
+
+[node name="InnerAnchor2" type="Node2D" parent="EmitterAnchor" unique_id=839220818]
+position = Vector2(94.1, 129.4)
+rotation = 3.6824687
+scale = Vector2(1.0000002, 1.0000002)
+script = ExtResource("5_anchr")
+RotationSpeed = 80.0
+
+[node name="Emitter3" type="Node2D" parent="EmitterAnchor/InnerAnchor2" unique_id=1632718640]
+rotation = -2.088985
+scale = Vector2(0.99999976, 0.99999976)
+script = ExtResource("3_mwv1k")
+Pattern = SubResource("Resource_u0qgi")
+Cadence = SubResource("Resource_h7uuo")
+
+[node name="Emitter4" type="Node2D" parent="EmitterAnchor" unique_id=1940174782]
+position = Vector2(-94.1, 129.4)
+rotation = 3.7699113
+script = ExtResource("3_mwv1k")
+Pattern = SubResource("Resource_u0qgi")
+Cadence = SubResource("Resource_gh0jr")
+
+[node name="Emitter5" type="Node2D" parent="EmitterAnchor" unique_id=1771438618]
+position = Vector2(-152.2, -49.4)
+rotation = 5.0265484
+script = ExtResource("3_mwv1k")
+Pattern = SubResource("Resource_u0qgi")
+Cadence = SubResource("Resource_cshfi")
 
 [node name="BulletField" parent="." unique_id=2001126864 instance=ExtResource("2_uvo3e")]
 MaxBullets = 8000

@@ -2,20 +2,27 @@
 
 [ext_resource type="Script" uid="uid://bobgiq1h8psuq" path="res://game/bullets/BulletField.cs" id="1_bmkvs"]
 [ext_resource type="Shader" uid="uid://dt2wk80euv4f2" path="res://game/bullets/rendering/bullet.gdshader" id="2_i85sv"]
+[ext_resource type="Texture2D" uid="uid://bvbdatrg16o0s" path="res://game/bullets/rendering/Shot_01.png" id="3_atlas"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ig7tw"]
 shader = ExtResource("2_i85sv")
 
-[sub_resource type="QuadMesh" id="QuadMesh_qc6od"]
-size = Vector2(20, 20)
+[sub_resource type="QuadMesh" id="QuadMesh_u0qgi"]
 
-[sub_resource type="MultiMesh" id="MultiMesh_5dalj"]
-mesh = SubResource("QuadMesh_qc6od")
+[sub_resource type="MultiMesh" id="MultiMesh_cafcq"]
+use_colors = true
+use_custom_data = false
+transform_format = 0
+instance_count = 0
+visible_instance_count = 0
+mesh = SubResource("QuadMesh_u0qgi")
 
 [node name="BulletField" type="Node2D" unique_id=2001126864 node_paths=PackedStringArray("_multiMeshInstance")]
 script = ExtResource("1_bmkvs")
+Atlas = ExtResource("3_atlas")
 _multiMeshInstance = NodePath("BulletRenderer")
 
 [node name="BulletRenderer" type="MultiMeshInstance2D" parent="." unique_id=395819944]
 material = SubResource("ShaderMaterial_ig7tw")
-multimesh = SubResource("MultiMesh_5dalj")
+multimesh = SubResource("MultiMesh_cafcq")
+texture = ExtResource("3_atlas")

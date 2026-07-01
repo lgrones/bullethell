@@ -8,5 +8,6 @@ namespace bullethell.game.patterns.shots;
 public abstract partial class ShotPattern : Pattern
 {
     [Export] public BulletBehavior? Behavior;
+    [Export] public BulletStyleResource? Style;
     [Export] public float Speed = 200f;
 }

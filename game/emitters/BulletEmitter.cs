@@ -39,6 +39,7 @@ public sealed partial class BulletEmitter : Node2D
     private Cadence? _cadence;
     private IBulletSink? _sink;
     private BehaviorTable? _table;
+    private StyleTable? _styles;
     private IntervalTimer? _timer;
     private int _shotIndex;
 
@@ -48,7 +49,7 @@ public sealed partial class BulletEmitter : Node2D
 
     public override void _PhysicsProcess(double delta)
     {
-        if (Pattern is null || Cadence is null || _sink is null || _table is null)
+        if (Pattern is null || Cadence is null || _sink is null || _table is null || _styles is null)
             return;
 
         _timer!.Advance((float)delta);
@@ -57,6 +58,7 @@ public sealed partial class BulletEmitter : Node2D
         var ctx = new EmitContext(
             _sink,
             _table,
+            _styles,
             Target?.GlobalPosition ?? Vector2.Zero,
             Target is not null,
             _timer.Elapsed);
@@ -84,8 +86,8 @@ public sealed partial class BulletEmitter : Node2D
         return [.. warnings];
     }
 
-    public void Initialize(IBulletSink sink, BehaviorTable table)
-        => (_sink, _table) = (sink, table);
+    public void Initialize(IBulletSink sink, BehaviorTable table, StyleTable styles)
+        => (_sink, _table, _styles) = (sink, table, styles);
 
     public void Disable()
         => ProcessMode = ProcessModeEnum.Disabled;
