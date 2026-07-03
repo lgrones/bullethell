@@ -12,6 +12,8 @@ namespace bullethell.game.emitters;
 public sealed partial class BulletEmitter : Node2D
 {
     [Export] public Node2D? Target;
+    
+    [Export] public Texture2D? Icon;
 
     [Export]
     public Pattern? Pattern
@@ -42,10 +44,14 @@ public sealed partial class BulletEmitter : Node2D
     private StyleTable? _styles;
     private IntervalTimer? _timer;
     private int _shotIndex;
-
-    // Start Due so the first physics tick pulls the real interval from Cadence.
+    
     public override void _Ready()
-        => _timer = new IntervalTimer(0f);
+    {
+        _timer = new IntervalTimer(0f);
+
+        if (Icon is not null)
+            AddChild(new Sprite2D { Texture = Icon });
+    }
 
     public override void _PhysicsProcess(double delta)
     {

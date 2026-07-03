@@ -3,7 +3,6 @@ using bullethell.game.core;
 using bullethell.game.emitters;
 using bullethell.game.phases;
 using Godot;
-using Timer = bullethell.game.core.timers.Timer;
 
 namespace bullethell.game.actors.enemies;
 
@@ -15,16 +14,17 @@ public partial class Boss : Node2D, ICollidable
 
     [Export] public float Radius = 8f;
     [Export] public float HitRadius { get; set; } = 10f;
+    [Export] public float HpRingRadius = 60f;
     [Export] public PackedScene[] Phases = [];
 
     /// Field the phase emitters fire into, and the player they aim at. Set by Main.
     public BulletField Field = null!;
     public Node2D? PlayerTarget;
 
-    private int _currentPhase;
-    private uint _currentHp;
+    /// The fight's signal hub — Main hands this to the HUD. Built in Begin().
+    public PhaseController Controller { get; private set; } = null!;
+
     private BossPhase? _phase;
-    private Timer _phaseTimer = null!;
 
     public override void _Ready()
     {
@@ -36,51 +36,40 @@ public partial class Boss : Node2D, ICollidable
     /// before Main._Ready, so this can't live in _Ready).
     public void Begin()
     {
-        if (Phases.Length > 0)
-            EnablePhase();
+        Controller = new PhaseController(Phases.Length);
+        Controller.PhaseEntered += OnPhaseEntered;
+        Controller.Defeated += () => EmitSignal(SignalName.Defeated);
+        Controller.Health.Changed += (_, _) => QueueRedraw();
+        Controller.Start();
     }
 
     public override void _Process(double delta)
-    {
-        if (_phase is null)
-            return;
-
-        _phaseTimer.Update((float)delta);
-
-        if (_currentHp == 0 || _phaseTimer.IsElapsed)
-            NextPhase();
-    }
+        => Controller.Update((float)delta);
 
     public override void _Draw()
-        => DrawCircle(Vector2.Zero, Radius, Colors.GreenYellow);
-
-    /// One bullet connected. Drains phase HP; _Process advances when it empties.
-    public void Hit()
     {
-        if (_currentHp > 0)
-            _currentHp--;
+        DrawArc(Vector2.Zero, HpRingRadius, 0f, Mathf.Tau, 48,
+            new Color(0f, 0f, 0f, 0.35f), 5f, true);
+
+        var fraction = Controller.Health.Fraction;
+        var end = -Mathf.Pi / 2f + Mathf.Tau * fraction;
+        DrawArc(Vector2.Zero, HpRingRadius, -Mathf.Pi / 2f, end, 48,
+            Colors.Crimson, 5f, true);
     }
 
-    private void NextPhase()
+    /// One bullet connected. Drains phase HP; the controller advances when it empties.
+    public void Hit() => Controller.Damage();
+
+    /// Controller entered a phase: swap in its scene, wire emitters, feed its HP/duration.
+    private void OnPhaseEntered(int index)
     {
-        _phase?.QueueFree();
-        _phase = null;
-        Field.Clear();
-
-        _currentPhase++;
-
-        if (_currentPhase >= Phases.Length)
+        if (_phase is not null)
         {
-            EmitSignal(SignalName.Defeated);
-            return;
+            _phase.QueueFree();
+            Field.Clear();
         }
 
-        EnablePhase();
-    }
-
-    private void EnablePhase()
-    {
-        var phase = Phases[_currentPhase].Instantiate<BossPhase>();
+        var phase = Phases[index].Instantiate<BossPhase>();
         AddChild(phase);
 
         foreach (var emitter in phase.FindEmitters())
@@ -90,7 +79,6 @@ public partial class Boss : Node2D, ICollidable
         }
 
         _phase = phase;
-        _phaseTimer = new Timer(phase.Duration);
-        _currentHp = phase.Hp;
+        Controller.Configure((int)phase.Hp, phase.Duration);
     }
 }

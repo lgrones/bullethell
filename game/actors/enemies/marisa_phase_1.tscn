@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://ck6c070qu78do" path="res://game/bullets/behaviors/BulletStyleResource.cs" id="5_c3vd0"]
 [ext_resource type="Script" uid="uid://ds52o3ol62flm" path="res://game/patterns/shots/StraightShot.cs" id="6_rifd2"]
 [ext_resource type="Script" uid="uid://c6bir11fkxpde" path="res://game/emitters/cadences/LinearCadence.cs" id="7_mu5dj"]
+[ext_resource type="Texture2D" uid="uid://bktrhdw522lq8" path="res://assets/placeholders/emitter.png" id="8_emit"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_star"]
 atlas = ExtResource("4_1drfh")
@@ -71,6 +72,7 @@ RotationSpeed = 80.0
 [node name="Emitter" type="Node2D" parent="EmitterAnchor/InnerAnchor" unique_id=1114368473]
 scale = Vector2(0.9999999, 0.9999999)
 script = ExtResource("3_7yfxk")
+Icon = ExtResource("8_emit")
 Pattern = SubResource("Resource_u0qgi")
 Cadence = SubResource("Resource_5c6eh")
 
@@ -78,6 +80,7 @@ Cadence = SubResource("Resource_5c6eh")
 position = Vector2(152.2, -49.4)
 rotation = 1.2566371
 script = ExtResource("3_7yfxk")
+Icon = ExtResource("8_emit")
 Pattern = SubResource("Resource_u0qgi")
 Cadence = SubResource("Resource_g8rhh")
 
@@ -92,6 +95,7 @@ RotationSpeed = 80.0
 rotation = -2.088985
 scale = Vector2(0.99999976, 0.99999976)
 script = ExtResource("3_7yfxk")
+Icon = ExtResource("8_emit")
 Pattern = SubResource("Resource_u0qgi")
 Cadence = SubResource("Resource_h7uuo")
 
@@ -99,6 +103,7 @@ Cadence = SubResource("Resource_h7uuo")
 position = Vector2(-94.1, 129.4)
 rotation = 3.7699113
 script = ExtResource("3_7yfxk")
+Icon = ExtResource("8_emit")
 Pattern = SubResource("Resource_u0qgi")
 Cadence = SubResource("Resource_gh0jr")
 
@@ -106,5 +111,6 @@ Cadence = SubResource("Resource_gh0jr")
 position = Vector2(-152.2, -49.4)
 rotation = 5.0265484
 script = ExtResource("3_7yfxk")
+Icon = ExtResource("8_emit")
 Pattern = SubResource("Resource_u0qgi")
 Cadence = SubResource("Resource_cshfi")

@@ -42,8 +42,8 @@ public partial class Player : Node2D, ICollidable
 
     public override void _Draw()
     {
-        DrawCircle(Vector2.Zero, Radius, Colors.White);
-
+        // Body is the Sprite2D child now; only the focus hitbox dot is drawn,
+        // on top of the sprite (which sits behind via show_behind_parent).
         if (IsFocused())
             DrawCircle(Vector2.Zero, HitRadius, Colors.Red);
     }
