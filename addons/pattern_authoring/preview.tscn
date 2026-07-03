@@ -7,11 +7,17 @@
 [ext_resource type="Script" uid="uid://ck6c070qu78do" path="res://game/bullets/behaviors/BulletStyleResource.cs" id="3_pyg58"]
 [ext_resource type="Script" uid="uid://c6bir11fkxpde" path="res://game/emitters/cadences/LinearCadence.cs" id="4_pyg58"]
 [ext_resource type="Script" uid="uid://dte8y7ebm5fwc" path="res://game/emitters/EmitterAnchor.cs" id="5_anchr"]
+[ext_resource type="Texture2D" uid="uid://bvbdatrg16o0s" path="res://game/bullets/rendering/Shot_01.png" id="6_atlas"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_star"]
+atlas = ExtResource("6_atlas")
+region = Rect2(609, 33, 30, 30)
 
 [sub_resource type="Resource" id="Resource_13p55"]
 script = ExtResource("3_pyg58")
+Radius = 20.0
 Rainbow = true
-Region = Rect2(609, 33, 30, 30)
+Texture = SubResource("AtlasTexture_star")
 Rotation = 2
 metadata/_custom_type_script = "uid://ck6c070qu78do"
 
@@ -50,14 +56,14 @@ metadata/_custom_type_script = "uid://c6bir11fkxpde"
 script = ExtResource("1_aad4j")
 
 [node name="EmitterAnchor" type="Node2D" parent="." unique_id=1509211688]
-position = Vector2(574.00006, 192.00003)
-rotation = 0.9689254
+position = Vector2(281.99997, 175)
+rotation = 3.32156
 script = ExtResource("5_anchr")
 RotationSpeed = 100.0
 
 [node name="InnerAnchor" type="Node2D" parent="EmitterAnchor" unique_id=1957118244]
 position = Vector2(0, -160)
-rotation = 5.791236
+rotation = 1.7623972
 scale = Vector2(1.0000001, 1.0000001)
 script = ExtResource("5_anchr")
 RotationSpeed = 80.0
@@ -77,7 +83,7 @@ Cadence = SubResource("Resource_g8rhh")
 
 [node name="InnerAnchor2" type="Node2D" parent="EmitterAnchor" unique_id=839220818]
 position = Vector2(94.1, 129.4)
-rotation = 3.6824687
+rotation = 5.9368243
 scale = Vector2(1.0000002, 1.0000002)
 script = ExtResource("5_anchr")
 RotationSpeed = 80.0

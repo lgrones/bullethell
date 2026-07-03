@@ -11,8 +11,6 @@ public sealed partial class BulletField : Node2D, IBulletSink
 {
     [Export] public int MaxBullets = 4096;
     [Export] public Node2D? Player;
-    [Export] public Texture2D? Atlas;
-    [Export] private MultiMeshInstance2D _multiMeshInstance = null!;
 
     public BehaviorTable Table = new();
     public StyleTable Styles = new();
@@ -28,8 +26,8 @@ public sealed partial class BulletField : Node2D, IBulletSink
     {
         _pool = new BulletPool(MaxBullets);
         _simulation = new SimulationSystem(Table);
-        _cull = new CullSystem();
-        _render = new RenderSystem(_multiMeshInstance, Styles, Atlas, MaxBullets);
+        _cull = new CullSystem(Styles);
+        _render = new RenderSystem(this, Styles, MaxBullets);
 
         var viewport = GetViewportRect().Size;
         _bounds = new Rect2(-64, -64, viewport.X + 128, viewport.Y + 128);

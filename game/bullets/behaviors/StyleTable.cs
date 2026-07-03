@@ -13,13 +13,14 @@ public enum RotationMode : byte
     Spin,          // continuous spin at SpinRate rad/s
 }
 
-/// Baked, render-ready copy of a BulletStyleResource. Region stays in pixels;
-/// the field normalizes it against the atlas size at draw time.
+/// Baked, render-ready copy of a BulletStyleResource. One MultiMesh per style,
+/// so the texture rides along and picks the draw call.
 public struct BulletStyle
 {
-    public Rect2 Region;
+    public Texture2D? Texture;
     public Color Tint;
     public bool Rainbow;
+    public bool Glow;
     public float Radius;
     public float HitRadius;
     public RotationMode Rotation;
@@ -36,10 +37,10 @@ public sealed class StyleTable
 
     public StyleTable()
     {
-        // id 0 = fallback: 16px top-left cell, plain white.
+        // id 0 = fallback: no texture -> white quad, plain white.
         _styles.Add(new BulletStyle
         {
-            Region = new Rect2(0, 0, 16, 16),
+            Texture = null,
             Tint = Colors.White,
             Radius = 8f,
             HitRadius = 4f,
@@ -62,9 +63,10 @@ public sealed class StyleTable
         _ids[style] = id;
         _styles.Add(new BulletStyle
         {
-            Region = style.Region,
+            Texture = style.Texture,
             Tint = style.Color,
             Rainbow = style.Rainbow,
+            Glow = style.Glow,
             Radius = style.Radius,
             HitRadius = style.HitRadius,
             Rotation = style.Rotation,
