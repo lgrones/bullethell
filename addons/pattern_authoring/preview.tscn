@@ -1,113 +1,13 @@
 [gd_scene format=3 uid="uid://dph6wy10nv5h8"]
 
 [ext_resource type="Script" uid="uid://cdr8dgrdhvbyt" path="res://addons/pattern_authoring/PreviewMain.cs" id="1_aad4j"]
+[ext_resource type="PackedScene" uid="uid://c135ks8qkt6aa" path="res://game/actors/enemies/marisa_phase_1.tscn" id="2_aad4j"]
 [ext_resource type="PackedScene" uid="uid://bswteemawxgoy" path="res://game/bullets/bullet_field.tscn" id="2_uvo3e"]
-[ext_resource type="Script" uid="uid://ds52o3ol62flm" path="res://game/patterns/shots/StraightShot.cs" id="3_eepdp"]
-[ext_resource type="Script" uid="uid://dlokb3krq7k2u" path="res://game/emitters/BulletEmitter.cs" id="3_mwv1k"]
-[ext_resource type="Script" uid="uid://ck6c070qu78do" path="res://game/bullets/behaviors/BulletStyleResource.cs" id="3_pyg58"]
-[ext_resource type="Script" uid="uid://c6bir11fkxpde" path="res://game/emitters/cadences/LinearCadence.cs" id="4_pyg58"]
-[ext_resource type="Script" uid="uid://dte8y7ebm5fwc" path="res://game/emitters/EmitterAnchor.cs" id="5_anchr"]
-[ext_resource type="Texture2D" uid="uid://bvbdatrg16o0s" path="res://game/bullets/rendering/Shot_01.png" id="6_atlas"]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_star"]
-atlas = ExtResource("6_atlas")
-region = Rect2(609, 33, 30, 30)
-
-[sub_resource type="Resource" id="Resource_13p55"]
-script = ExtResource("3_pyg58")
-Radius = 20.0
-Rainbow = true
-Texture = SubResource("AtlasTexture_star")
-Rotation = 2
-metadata/_custom_type_script = "uid://ck6c070qu78do"
-
-[sub_resource type="Resource" id="Resource_u0qgi"]
-script = ExtResource("3_eepdp")
-Style = SubResource("Resource_13p55")
-Speed = 100.0
-metadata/_custom_type_script = "uid://ds52o3ol62flm"
-
-[sub_resource type="Resource" id="Resource_5c6eh"]
-script = ExtResource("4_pyg58")
-ShotInterval = 0.07
-metadata/_custom_type_script = "uid://c6bir11fkxpde"
-
-[sub_resource type="Resource" id="Resource_g8rhh"]
-script = ExtResource("4_pyg58")
-ShotInterval = 0.05
-metadata/_custom_type_script = "uid://c6bir11fkxpde"
-
-[sub_resource type="Resource" id="Resource_h7uuo"]
-script = ExtResource("4_pyg58")
-ShotInterval = 0.07
-metadata/_custom_type_script = "uid://c6bir11fkxpde"
-
-[sub_resource type="Resource" id="Resource_gh0jr"]
-script = ExtResource("4_pyg58")
-ShotInterval = 0.06
-metadata/_custom_type_script = "uid://c6bir11fkxpde"
-
-[sub_resource type="Resource" id="Resource_cshfi"]
-script = ExtResource("4_pyg58")
-ShotInterval = 0.04
-metadata/_custom_type_script = "uid://c6bir11fkxpde"
 
 [node name="PreviewMain" type="Node2D" unique_id=1936638775]
 script = ExtResource("1_aad4j")
 
-[node name="EmitterAnchor" type="Node2D" parent="." unique_id=1509211688]
-position = Vector2(281.99997, 175)
-rotation = 3.32156
-script = ExtResource("5_anchr")
-RotationSpeed = 100.0
-
-[node name="InnerAnchor" type="Node2D" parent="EmitterAnchor" unique_id=1957118244]
-position = Vector2(0, -160)
-rotation = 1.7623972
-scale = Vector2(1.0000001, 1.0000001)
-script = ExtResource("5_anchr")
-RotationSpeed = 80.0
-
-[node name="Emitter" type="Node2D" parent="EmitterAnchor/InnerAnchor" unique_id=1509211687]
-scale = Vector2(0.9999999, 0.9999999)
-script = ExtResource("3_mwv1k")
-Pattern = SubResource("Resource_u0qgi")
-Cadence = SubResource("Resource_5c6eh")
-
-[node name="Emitter2" type="Node2D" parent="EmitterAnchor" unique_id=187952956]
-position = Vector2(152.2, -49.4)
-rotation = 1.2566371
-script = ExtResource("3_mwv1k")
-Pattern = SubResource("Resource_u0qgi")
-Cadence = SubResource("Resource_g8rhh")
-
-[node name="InnerAnchor2" type="Node2D" parent="EmitterAnchor" unique_id=839220818]
-position = Vector2(94.1, 129.4)
-rotation = 5.9368243
-scale = Vector2(1.0000002, 1.0000002)
-script = ExtResource("5_anchr")
-RotationSpeed = 80.0
-
-[node name="Emitter3" type="Node2D" parent="EmitterAnchor/InnerAnchor2" unique_id=1632718640]
-rotation = -2.088985
-scale = Vector2(0.99999976, 0.99999976)
-script = ExtResource("3_mwv1k")
-Pattern = SubResource("Resource_u0qgi")
-Cadence = SubResource("Resource_h7uuo")
-
-[node name="Emitter4" type="Node2D" parent="EmitterAnchor" unique_id=1940174782]
-position = Vector2(-94.1, 129.4)
-rotation = 3.7699113
-script = ExtResource("3_mwv1k")
-Pattern = SubResource("Resource_u0qgi")
-Cadence = SubResource("Resource_gh0jr")
-
-[node name="Emitter5" type="Node2D" parent="EmitterAnchor" unique_id=1771438618]
-position = Vector2(-152.2, -49.4)
-rotation = 5.0265484
-script = ExtResource("3_mwv1k")
-Pattern = SubResource("Resource_u0qgi")
-Cadence = SubResource("Resource_cshfi")
+[node name="Phase" parent="." unique_id=1612727468 instance=ExtResource("2_aad4j")]
 
 [node name="BulletField" parent="." unique_id=2001126864 instance=ExtResource("2_uvo3e")]
 MaxBullets = 8000

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BulletStyleResource" format=3 uid="uid://0mr033rvkvjk"]
+
+[ext_resource type="Script" uid="uid://ck6c070qu78do" path="res://game/bullets/behaviors/BulletStyleResource.cs" id="1_style"]
+[ext_resource type="Texture2D" uid="uid://bvbdatrg16o0s" path="res://game/bullets/rendering/Shot_01.png" id="2_atlas"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_star"]
+atlas = ExtResource("2_atlas")
+region = Rect2(609, 33, 30, 30)
+
+[resource]
+script = ExtResource("1_style")
+HitRadius = 6.0
+Texture = SubResource("AtlasTexture_star")
+metadata/_custom_type_script = "uid://ck6c070qu78do"

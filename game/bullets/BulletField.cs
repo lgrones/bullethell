@@ -1,5 +1,6 @@
 using bullethell.game.bullets.behaviors;
 using bullethell.game.bullets.systems;
+using bullethell.game.core;
 using Godot;
 
 namespace bullethell.game.bullets;
@@ -9,14 +10,22 @@ namespace bullethell.game.bullets;
 [Tool]
 public sealed partial class BulletField : Node2D, IBulletSink
 {
+    /// Fires once per bullet that hits Target. Wire to the target's damage handler.
+    [Signal]
+    public delegate void HitEventHandler();
+
     [Export] public int MaxBullets = 4096;
-    [Export] public Node2D? Player;
+
+    /// Homing/aimed target for the simulation, and the collision victim if it's
+    /// an ICollidable (Player or Boss). One node serves both roles.
+    [Export] public Node2D? Target;
 
     public BehaviorTable Table = new();
     public StyleTable Styles = new();
 
     private BulletPool _pool = null!;
     private SimulationSystem _simulation = null!;
+    private CollisionSystem _collision = null!;
     private CullSystem _cull = null!;
     private RenderSystem _render = null!;
     private Rect2 _bounds;
@@ -26,6 +35,7 @@ public sealed partial class BulletField : Node2D, IBulletSink
     {
         _pool = new BulletPool(MaxBullets);
         _simulation = new SimulationSystem(Table);
+        _collision = new CollisionSystem(Styles) { OnHit = () => EmitSignal(SignalName.Hit) };
         _cull = new CullSystem(Styles);
         _render = new RenderSystem(this, Styles, MaxBullets);
 
@@ -40,15 +50,17 @@ public sealed partial class BulletField : Node2D, IBulletSink
         var frame = new BulletFrame(
             (float)delta,
             _time,
-            Player?.GlobalPosition ?? Vector2.Zero,
-            Player is not null,
+            Target?.GlobalPosition ?? Vector2.Zero,
+            Target is not null,
             _bounds);
+
+        _collision.Target = Target as ICollidable;
 
         _pool.Flush();                  // admit emitter spawns
         _simulation.Run(_pool, frame);  // move + state machine + explosions
         _pool.Flush();                  // admit explosion spawns
+        _collision.Run(_pool, frame);   // hit Target -> dead + Hit signal
         _cull.Run(_pool, frame);        // bounds -> dead
-        // future: _collision.Run(_pool, frame);
         _pool.Compact();                // drop dead
         _render.Run(_pool, frame);      // draw survivors
     }
@@ -60,4 +72,6 @@ public sealed partial class BulletField : Node2D, IBulletSink
     }
 
     public void SpawnBullet(in BulletSpawn bullet) => _pool.SpawnBullet(bullet);
+
+    public void Clear() => _pool.Clear();
 }
