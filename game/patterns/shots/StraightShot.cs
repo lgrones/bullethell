@@ -13,7 +13,8 @@ public partial class StraightShot : ShotPattern
         var spawn = new BulletSpawn {
             Position = Vector2.Zero,
             Velocity = new Vector2(Speed, 0),
-            BehaviorId = ctx.Table.IdFor(Behavior)
+            BehaviorId = ctx.Table.IdFor(Behavior),
+            StyleId = ctx.Styles.IdFor(Style)
         };
 
         ctx.Sink.SpawnBullet(spawn.Transformed(frame));

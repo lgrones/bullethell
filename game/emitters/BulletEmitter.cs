@@ -12,6 +12,8 @@ namespace bullethell.game.emitters;
 public sealed partial class BulletEmitter : Node2D
 {
     [Export] public Node2D? Target;
+    
+    [Export] public Texture2D? Icon;
 
     [Export]
     public Pattern? Pattern
@@ -39,16 +41,21 @@ public sealed partial class BulletEmitter : Node2D
     private Cadence? _cadence;
     private IBulletSink? _sink;
     private BehaviorTable? _table;
+    private StyleTable? _styles;
     private IntervalTimer? _timer;
     private int _shotIndex;
-
-    // Start Due so the first physics tick pulls the real interval from Cadence.
+    
     public override void _Ready()
-        => _timer = new IntervalTimer(0f);
+    {
+        _timer = new IntervalTimer(0f);
+
+        if (Icon is not null)
+            AddChild(new Sprite2D { Texture = Icon });
+    }
 
     public override void _PhysicsProcess(double delta)
     {
-        if (Pattern is null || Cadence is null || _sink is null || _table is null)
+        if (Pattern is null || Cadence is null || _sink is null || _table is null || _styles is null)
             return;
 
         _timer!.Advance((float)delta);
@@ -57,6 +64,7 @@ public sealed partial class BulletEmitter : Node2D
         var ctx = new EmitContext(
             _sink,
             _table,
+            _styles,
             Target?.GlobalPosition ?? Vector2.Zero,
             Target is not null,
             _timer.Elapsed);
@@ -84,8 +92,8 @@ public sealed partial class BulletEmitter : Node2D
         return [.. warnings];
     }
 
-    public void Initialize(IBulletSink sink, BehaviorTable table)
-        => (_sink, _table) = (sink, table);
+    public void Initialize(IBulletSink sink, BehaviorTable table, StyleTable styles)
+        => (_sink, _table, _styles) = (sink, table, styles);
 
     public void Disable()
         => ProcessMode = ProcessModeEnum.Disabled;

@@ -7,12 +7,17 @@ namespace bullethell.game.actors;
 
 public partial class Player : Node2D, ICollidable
 {
+    /// Raised when a bullet connects. Main clears the field and respawns/ends.
+    [Signal]
+    public delegate void DiedEventHandler();
+
     [Export] public float Speed = 280f;
     [Export] public float FocusSpeed = 110f;
     [Export] public float Radius = 8f;
     [Export] public float HitRadius { get; set; } = 3f;
 
     private Vector2 _viewport;
+    private bool _dead;
     public readonly List<BulletEmitter> Emitters = [];
 
     public override void _Ready()
@@ -37,26 +42,31 @@ public partial class Player : Node2D, ICollidable
 
     public override void _Draw()
     {
-        DrawCircle(Vector2.Zero, Radius, Colors.White);
-
+        // Body is the Sprite2D child now; only the focus hitbox dot is drawn,
+        // on top of the sprite (which sits behind via show_behind_parent).
         if (IsFocused())
             DrawCircle(Vector2.Zero, HitRadius, Colors.Red);
     }
 
     public void Respawn()
-        => Position = new Vector2(_viewport.X * 0.5f, _viewport.Y * 0.8f);
-
-    public bool IsHit(Vector2 position, float hitRadius)
     {
-        var r = HitRadius + hitRadius;
-        return Position.DistanceSquaredTo(position) < r * r;
+        _dead = false;
+        Position = new Vector2(_viewport.X * 0.5f, _viewport.Y * 0.8f);
+    }
+
+    /// One bullet connected. 1-hit death: emit Died once, then ignore further
+    /// hits until Respawn clears the flag (a wall of bullets costs one life, not many).
+    public void Hit()
+    {
+        if (_dead)
+            return;
+
+        _dead = true;
+        EmitSignal(SignalName.Died);
     }
 
     private static bool IsFocused()
         => Input.IsActionPressed("focus");
-
-    private static bool IsFiring()
-        => Input.IsActionPressed("fire");
 
     private void Move(float delta)
     {

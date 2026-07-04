@@ -6,6 +6,8 @@ public class Timer(float duration)
     private float _duration = duration;
     
     public bool IsElapsed { get; private set; }
+    public float Remaining => _duration - _elapsed > 0f ? _duration - _elapsed : 0f;
+    public float Duration => _duration;
 
     public void Update(float delta)
     {

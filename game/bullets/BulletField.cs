@@ -1,30 +1,43 @@
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using bullethell.game.bullets.behaviors;
+using bullethell.game.bullets.systems;
+using bullethell.game.core;
 using Godot;
 
 namespace bullethell.game.bullets;
 
+/// Owns the bullet pool and runs the per-frame system pipeline.
+/// Emitters push spawns via IBulletSink; systems do the work.
 [Tool]
 public sealed partial class BulletField : Node2D, IBulletSink
 {
+    /// Fires once per bullet that hits Target. Wire to the target's damage handler.
+    [Signal]
+    public delegate void HitEventHandler();
+
     [Export] public int MaxBullets = 4096;
-    [Export] public Node2D? Player;
-    [Export] private MultiMeshInstance2D _multiMeshInstance = null!;
+
+    /// Homing/aimed target for the simulation, and the collision victim if it's
+    /// an ICollidable (Player or Boss). One node serves both roles.
+    [Export] public Node2D? Target;
 
     public BehaviorTable Table = new();
+    public StyleTable Styles = new();
 
-    private readonly List<Bullet> _pool = [];
-    private readonly List<BulletSpawn> _pending = [];
-    private MultiMesh _mesh = null!;
+    private BulletPool _pool = null!;
+    private SimulationSystem _simulation = null!;
+    private CollisionSystem _collision = null!;
+    private CullSystem _cull = null!;
+    private RenderSystem _render = null!;
     private Rect2 _bounds;
+    private float _time;
 
     public override void _Ready()
     {
-        _mesh = _multiMeshInstance.Multimesh;
-        _mesh.TransformFormat = MultiMesh.TransformFormatEnum.Transform2D;
-        _mesh.InstanceCount = MaxBullets;
-        _mesh.VisibleInstanceCount = 0;
+        _pool = new BulletPool(MaxBullets);
+        _simulation = new SimulationSystem(Table);
+        _collision = new CollisionSystem(Styles) { OnHit = () => EmitSignal(SignalName.Hit) };
+        _cull = new CullSystem(Styles);
+        _render = new RenderSystem(this, Styles, MaxBullets);
 
         var viewport = GetViewportRect().Size;
         _bounds = new Rect2(-64, -64, viewport.X + 128, viewport.Y + 128);
@@ -32,11 +45,24 @@ public sealed partial class BulletField : Node2D, IBulletSink
 
     public override void _PhysicsProcess(double delta)
     {
-        Flush();
-        UpdateBullets((float)delta, Player?.GlobalPosition ?? Vector2.Zero, Player is not null);
-        Flush();
-        Compact();
-        SyncMultiMesh();
+        _time += (float)delta;
+
+        var frame = new BulletFrame(
+            (float)delta,
+            _time,
+            Target?.GlobalPosition ?? Vector2.Zero,
+            Target is not null,
+            _bounds);
+
+        _collision.Target = Target as ICollidable;
+
+        _pool.Flush();                  // admit emitter spawns
+        _simulation.Run(_pool, frame);  // move + state machine + explosions
+        _pool.Flush();                  // admit explosion spawns
+        _collision.Run(_pool, frame);   // hit Target -> dead + Hit signal
+        _cull.Run(_pool, frame);        // bounds -> dead
+        _pool.Compact();                // drop dead
+        _render.Run(_pool, frame);      // draw survivors
     }
 
     public override void _Draw()
@@ -45,115 +71,7 @@ public sealed partial class BulletField : Node2D, IBulletSink
             DrawRect(_bounds, Colors.Red, filled: false);
     }
 
-    public void SpawnBullet(in BulletSpawn bullet) => _pending.Add(bullet);
+    public void SpawnBullet(in BulletSpawn bullet) => _pool.SpawnBullet(bullet);
 
-    private void Flush()
-    {
-        foreach (var s in _pending)
-            _pool.Add(new Bullet
-            {
-                Position = s.Position,
-                Velocity = s.Velocity,
-                BehaviorId = s.BehaviorId,
-                StateIndex = 0,
-                StateTimer = 0f,
-                Alive = true
-            });
-
-        _pending.Clear();
-    }
-
-    private void UpdateBullets(float dt, Vector2 targetPos, bool hasTarget)
-    {
-        var span = CollectionsMarshal.AsSpan(_pool);
-        var defs = Table.Defs;
-
-        for (var i = 0; i < span.Length; i++)
-        {
-            ref var b = ref span[i];
-            ref readonly var def = ref defs[Table.Offset(b.BehaviorId) + b.StateIndex];
-
-            b.StateTimer += dt;
-
-            switch (def.Move)
-            {
-                case MovementKind.Straight:
-                    b.Position += b.Velocity * dt;
-                    break;
-
-                case MovementKind.Homing:
-                    if (hasTarget)
-                    {
-                        var desired = (targetPos - b.Position).Normalized();
-                        var turn = Mathf.Clamp(b.Velocity.AngleTo(desired), -def.TurnRate * dt, def.TurnRate * dt);
-                        b.Velocity = b.Velocity.Rotated(turn);
-                    }
-
-                    b.Position += b.Velocity * dt;
-                    break;
-            }
-            
-            if (!_bounds.HasPoint(b.Position))
-                b.Alive = false;
-
-            if (!ShouldExit(def, b, targetPos, hasTarget)) continue;
-
-            var count = Table.Count(b.BehaviorId);
-            if (b.StateIndex + 1 < count)
-            {
-                b.StateIndex++; // advance to next state
-                b.StateTimer = 0f;
-            }
-            else // last state ended → die (maybe explode)
-            {
-                if (def.OnEnd == DeathAction.Explode)
-                    EnqueueExplosion(b.Position, def);
-
-                b.Alive = false;
-            }
-        }
-    }
-
-    private static bool ShouldExit(in StateDefinition def, in Bullet b, Vector2 target, bool hasTarget) =>
-        def.Exit switch
-        {
-            TransitionKind.AfterTime => b.StateTimer >= def.ExitThreshold,
-            TransitionKind.NearTarget => hasTarget && b.Position.DistanceTo(target) <= def.ExitThreshold,
-            _ => false,
-        };
-
-    private void EnqueueExplosion(Vector2 at, in StateDefinition def)
-    {
-        for (var i = 0; i < def.ExplodeCount; i++)
-        {
-            var dir = Vector2.FromAngle(Mathf.Tau * i / def.ExplodeCount);
-
-            _pending.Add(new BulletSpawn
-            {
-                Position = at,
-                Velocity = dir * def.ExplodeSpeed
-            });
-        }
-    }
-
-    private void Compact()
-    {
-        for (var i = _pool.Count - 1; i >= 0; i--)
-        {
-            if (_pool[i].Alive) continue;
-
-            _pool[i] = _pool[^1];
-            _pool.RemoveAt(_pool.Count - 1);
-        }
-    }
-
-    private void SyncMultiMesh()
-    {
-        _mesh.VisibleInstanceCount = _pool.Count;
-
-        var span = CollectionsMarshal.AsSpan(_pool);
-
-        for (var i = 0; i < span.Length; i++)
-            _mesh.SetInstanceTransform2D(i, new Transform2D(span[i].Velocity.Angle(), span[i].Position));
-    }
+    public void Clear() => _pool.Clear();
 }

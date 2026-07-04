@@ -1,3 +1,4 @@
+using bullethell.game.bullets;
 using bullethell.game.emitters;
 using Godot;
 
@@ -10,9 +11,9 @@ public partial class PreviewMain : Node2D
     {
         if (!Engine.IsEditorHint()) return;
 
-        var field = GetNode<game.bullets.BulletField>("BulletField");
-        var emitter = GetNode<BulletEmitter>("%Emitter");
-        
-        emitter.Initialize(field, field.Table);
+        var field = GetNode<BulletField>("BulletField");
+
+        foreach (var emitter in this.FindEmitters())
+            emitter.Initialize(field, field.Table, field.Styles);
     }
 }

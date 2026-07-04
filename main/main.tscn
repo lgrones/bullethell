@@ -1,22 +1,99 @@
 [gd_scene format=3 uid="uid://2gycfvpavqnw"]
 
-[ext_resource type="Script" uid="uid://dg1otn2jcvxmu" path="res://main/Main.cs" id="1_bsumw"]
-[ext_resource type="PackedScene" uid="uid://bswteemawxgoy" path="res://game/bullets/bullet_field.tscn" id="2_fwcvl"]
-[ext_resource type="Script" uid="uid://clqyk3nrh0can" path="res://game/actors/enemies/Boss.cs" id="3_na0o7"]
-[ext_resource type="Script" uid="uid://dlokb3krq7k2u" path="res://game/emitters/BulletEmitter.cs" id="5_5xyti"]
-[ext_resource type="Script" uid="uid://bjon0sreg8b64" path="res://game/actors/Player.cs" id="10_q0sk7"]
+[ext_resource type="Script" uid="uid://dg1otn2jcvxmu" path="res://main/Main.cs" id="1_main"]
+[ext_resource type="PackedScene" uid="uid://bswteemawxgoy" path="res://game/bullets/bullet_field.tscn" id="2_field"]
+[ext_resource type="Script" uid="uid://clqyk3nrh0can" path="res://game/actors/enemies/Boss.cs" id="3_boss"]
+[ext_resource type="PackedScene" uid="uid://c135ks8qkt6aa" path="res://game/actors/enemies/marisa_phase_1.tscn" id="4_0i4oc"]
+[ext_resource type="Script" uid="uid://bjon0sreg8b64" path="res://game/actors/Player.cs" id="4_player"]
+[ext_resource type="Script" uid="uid://dlokb3krq7k2u" path="res://game/emitters/BulletEmitter.cs" id="5_emit"]
+[ext_resource type="Script" uid="uid://ds52o3ol62flm" path="res://game/patterns/shots/StraightShot.cs" id="6_straight"]
+[ext_resource type="Script" uid="uid://c6bir11fkxpde" path="res://game/emitters/cadences/LinearCadence.cs" id="7_cad"]
+[ext_resource type="Texture2D" uid="uid://bvbdatrg16o0s" path="res://game/bullets/rendering/Shot_01.png" id="8_bsumw"]
+[ext_resource type="Script" uid="uid://ck6c070qu78do" path="res://game/bullets/behaviors/BulletStyleResource.cs" id="9_fwcvl"]
+[ext_resource type="Texture2D" uid="uid://c0trdlb2u0asf" path="res://assets/placeholders/boss.png" id="10_boss"]
+[ext_resource type="Texture2D" uid="uid://c07et76iqttdc" path="res://assets/placeholders/player.png" id="11_player"]
+[ext_resource type="Texture2D" uid="uid://duu7lul5mdeyw" path="res://assets/placeholders/background.png" id="12_bg"]
+[ext_resource type="Script" path="res://main/Hud.cs" id="13_hud"]
+[ext_resource type="Texture2D" path="res://assets/placeholders/marisa_south.png" id="14_marisa"]
 
-[node name="Main" type="Node2D" unique_id=1279899591]
-script = ExtResource("1_bsumw")
+[sub_resource type="AtlasTexture" id="AtlasTexture_g8rhh"]
+atlas = ExtResource("8_bsumw")
+region = Rect2(19.05047, 177.02042, 9.993469, 15.061249)
 
-[node name="BulletField" parent="." unique_id=2001126864 instance=ExtResource("2_fwcvl")]
+[sub_resource type="Resource" id="Resource_btxyo"]
+script = ExtResource("9_fwcvl")
+Radius = 16.0
+HitRadius = 16.0
+Color = Color(0.23921569, 0.49411765, 1, 1)
+Texture = SubResource("AtlasTexture_g8rhh")
+metadata/_custom_type_script = "uid://ck6c070qu78do"
 
-[node name="Boss" type="Node2D" parent="." unique_id=195315039 node_paths=PackedStringArray("Phases")]
-script = ExtResource("3_na0o7")
-Phases = [NodePath(""), NodePath("")]
+[sub_resource type="Resource" id="PlayerShot"]
+script = ExtResource("6_straight")
+Style = SubResource("Resource_btxyo")
+Speed = 700.0
+metadata/_custom_type_script = "uid://ds52o3ol62flm"
 
-[node name="Player" type="Node2D" parent="." unique_id=2093934826]
-script = ExtResource("10_q0sk7")
+[sub_resource type="Resource" id="PlayerCadence"]
+script = ExtResource("7_cad")
+ShotInterval = 0.06
+metadata/_custom_type_script = "uid://c6bir11fkxpde"
 
-[node name="ShotEmitter" type="Node2D" parent="Player" unique_id=284822326 groups=["playerEmitters"]]
-script = ExtResource("5_5xyti")
+[node name="Main" type="Node2D" unique_id=588738428]
+script = ExtResource("1_main")
+
+[node name="Background" type="Sprite2D" parent="."]
+centered = false
+texture = ExtResource("12_bg")
+
+[node name="EnemyField" parent="." unique_id=1227888849 instance=ExtResource("2_field")]
+
+[node name="PlayerField" parent="." unique_id=1839369211 instance=ExtResource("2_field")]
+
+[node name="Boss" type="Node2D" parent="." unique_id=1219390961]
+script = ExtResource("3_boss")
+Phases = [ExtResource("4_0i4oc")]
+
+[node name="Body" type="Sprite2D" parent="Boss"]
+show_behind_parent = true
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("14_marisa")
+
+[node name="Player" type="Node2D" parent="." unique_id=690024232]
+script = ExtResource("4_player")
+
+[node name="Body" type="Sprite2D" parent="Player"]
+show_behind_parent = true
+texture = ExtResource("11_player")
+
+[node name="ShotEmitter" type="Node2D" parent="Player" unique_id=494865578 groups=["playerEmitters"]]
+rotation = -1.5707964
+script = ExtResource("5_emit")
+Pattern = SubResource("PlayerShot")
+Cadence = SubResource("PlayerCadence")
+
+[node name="Hud" type="CanvasLayer" parent="."]
+script = ExtResource("13_hud")
+
+[node name="PhaseBar" type="ProgressBar" parent="Hud"]
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -212.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = 34.0
+grow_horizontal = 0
+show_percentage = false
+
+[node name="LifeRow" type="HBoxContainer" parent="Hud"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -212.0
+offset_top = -40.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 0
+grow_vertical = 0
+alignment = 2

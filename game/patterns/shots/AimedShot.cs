@@ -18,7 +18,8 @@ public partial class AimedShot : ShotPattern
         {
             Position = Vector2.Zero,
             Velocity = direction * Speed,
-            BehaviorId = ctx.Table.IdFor(Behavior)
+            BehaviorId = ctx.Table.IdFor(Behavior),
+            StyleId = ctx.Styles.IdFor(Style)
         }.Transformed(frame));
     }
 }

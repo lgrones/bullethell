@@ -1,75 +1,84 @@
-using System.Collections.Generic;
 using bullethell.game.bullets;
 using bullethell.game.core;
+using bullethell.game.emitters;
 using bullethell.game.phases;
 using Godot;
-using Timer = bullethell.game.core.timers.Timer;
 
 namespace bullethell.game.actors.enemies;
 
 public partial class Boss : Node2D, ICollidable
 {
+    /// Raised when the last phase ends. Main turns this into a win/reset.
+    [Signal]
+    public delegate void DefeatedEventHandler();
+
     [Export] public float Radius = 8f;
     [Export] public float HitRadius { get; set; } = 10f;
-    [Export] public BossPhase[] Phases = [];
+    [Export] public float HpRingRadius = 60f;
+    [Export] public PackedScene[] Phases = [];
 
-    public List<Bullet> Field = [];
+    /// Field the phase emitters fire into, and the player they aim at. Set by Main.
+    public BulletField Field = null!;
+    public Node2D? PlayerTarget;
 
-    private int _currentPhase;
-    private uint _currentHp;
-    private Timer _phaseTimer = null!;
+    /// The fight's signal hub — Main hands this to the HUD. Built in Begin().
+    public PhaseController Controller { get; private set; } = null!;
+
+    private BossPhase? _phase;
 
     public override void _Ready()
     {
-        var viewPort = GetViewportRect().Size;
-        Position = new Vector2(viewPort.X * 0.5f, viewPort.Y * 0.15f);
+        var viewport = GetViewportRect().Size;
+        Position = new Vector2(viewport.X * 0.5f, viewport.Y * 0.15f);
+    }
 
-        EnablePhase();
+    /// Kicks off phase 0. Called by Main after Field is wired (Boss._Ready runs
+    /// before Main._Ready, so this can't live in _Ready).
+    public void Begin()
+    {
+        Controller = new PhaseController(Phases.Length);
+        Controller.PhaseEntered += OnPhaseEntered;
+        Controller.Defeated += () => EmitSignal(SignalName.Defeated);
+        Controller.Health.Changed += (_, _) => QueueRedraw();
+        Controller.Start();
     }
 
     public override void _Process(double delta)
-    {
-        if (_currentPhase == Phases.Length)
-            return;
-        
-        _phaseTimer.Update((float)delta);
-
-        if (_currentHp == 0 || _phaseTimer.IsElapsed)
-            NextPhase();
-    }
+        => Controller.Update((float)delta);
 
     public override void _Draw()
     {
-        DrawCircle(Vector2.Zero, Radius, Colors.GreenYellow);
+        DrawArc(Vector2.Zero, HpRingRadius, 0f, Mathf.Tau, 48,
+            new Color(0f, 0f, 0f, 0.35f), 5f, true);
+
+        var fraction = Controller.Health.Fraction;
+        var end = -Mathf.Pi / 2f + Mathf.Tau * fraction;
+        DrawArc(Vector2.Zero, HpRingRadius, -Mathf.Pi / 2f, end, 48,
+            Colors.Crimson, 5f, true);
     }
 
-    public bool IsHitBy(Vector2 position, float hitRadius)
+    /// One bullet connected. Drains phase HP; the controller advances when it empties.
+    public void Hit() => Controller.Damage();
+
+    /// Controller entered a phase: swap in its scene, wire emitters, feed its HP/duration.
+    private void OnPhaseEntered(int index)
     {
-        var isHit = ICollidable.Overlaps(Position, hitRadius, position, hitRadius);
+        if (_phase is not null)
+        {
+            _phase.QueueFree();
+            Field.Clear();
+        }
 
-        if (isHit && _currentHp > 0)
-            _currentHp--;
+        var phase = Phases[index].Instantiate<BossPhase>();
+        AddChild(phase);
 
-        return isHit;
-    }
+        foreach (var emitter in phase.FindEmitters())
+        {
+            emitter.Target = PlayerTarget;
+            emitter.Initialize(Field, Field.Table, Field.Styles);
+        }
 
-    private void NextPhase()
-    {
-        Phases[_currentPhase].ProcessMode = ProcessModeEnum.Disabled;
-        Field.Clear();
-
-        _currentPhase++;
-
-        if (_currentPhase == Phases.Length)
-            return;
-
-        EnablePhase();
-    }
-
-    private void EnablePhase()
-    {
-        _phaseTimer = new Timer(Phases[_currentPhase].Duration);
-        _currentHp = Phases[_currentPhase].Hp;
-        Phases[_currentPhase].ProcessMode = ProcessModeEnum.Inherit;
+        _phase = phase;
+        Controller.Configure((int)phase.Hp, phase.Duration);
     }
 }

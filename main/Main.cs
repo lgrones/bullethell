@@ -1,94 +1,77 @@
-using System.Collections;
-using System.Collections.Generic;
 using bullethell.game.actors;
 using bullethell.game.actors.enemies;
 using bullethell.game.bullets;
+using bullethell.game.core;
 using bullethell.game.emitters;
 using Godot;
 
 namespace bullethell.main;
 
+/// Wires the two bullet fields, the boss, and the player together and owns the
+/// run/lose/reset flow. Damage crosses via signals: enemy field -> player,
+/// player field -> boss, player.Died / boss.Defeated -> here.
 public partial class Main : Node2D
 {
-    // private Vector2 _viewport;
-    // private readonly List<Bullet> _playerShots = [];
-    // private Boss _boss = null!;
-    // private Player _player = null!;
-    // private game.bullets.BulletField _field = null!;
-    //
-    // public override void _Ready()
-    // {
-    //     _viewport = GetViewportRect().Size;
-    //     GetViewport().SizeChanged += () =>
-    //     {
-    //         _viewport = GetViewportRect().Size;
-    //         _field.PlayArea = _viewport;
-    //     };
-    //
-    //     _field = GetNode<game.bullets.BulletField>("BulletField");
-    //     
-    //     _player = GetNode<Player>("Player");
-    //     _boss = GetNode<Boss>("Boss");
-    //
-    //     _field.PlayArea = _viewport;
-    //     _field.Target = _player;
-    //     _field.TargetHit += Reset;
-    //     _boss.Field = _field.Bullets;
-    //     
-    //     foreach (var emitter in GetTree().GetNodesInGroup("playerEmitters"))
-    //     {
-    //         if (emitter is not BulletEmitter bulletEmitter) 
-    //             continue;
-    //         
-    //         bulletEmitter.Disable();
-    //         bulletEmitter.Sink = _playerShots;
-    //         _player.Emitters.Add(bulletEmitter);
-    //     }
-    //     
-    //     foreach (var emitter in GetTree().GetNodesInGroup("bossEmitters"))
-    //     {
-    //         if (emitter is not BulletEmitter bulletEmitter) 
-    //             continue;
-    //         
-    //         bulletEmitter.Sink = _field.Bullets;
-    //     }
-    // }
-    //
-    // public override void _Process(double delta)
-    // {
-    //     for (var i = _playerShots.Count - 1; i >= 0; i--)
-    //     {
-    //         var bullet = _playerShots[i];
-    //         bullet.Position += bullet.Velocity * (float)delta;
-    //         _playerShots[i] = bullet;
-    //         
-    //         if (!_boss.IsHitBy(bullet.Position, bullet.Style.HitRadius) && bullet.IsInBounds(_viewport))
-    //             continue;
-    //
-    //         Cull(_playerShots, i);
-    //     }
-    //
-    //     QueueRedraw();
-    // }
-    //
-    // public override void _Draw()
-    // {
-    //     foreach (var playerShot in _playerShots)
-    //     {
-    //         DrawCircle(playerShot.Position, playerShot.Style.Radius, Colors.White);
-    //     }
-    // }
-    //
-    // private static void Cull(IList sink, int index)
-    // {
-    //     sink[index] = sink[^1];
-    //     sink.RemoveAt(sink.Count - 1);
-    // }
-    //
-    // private void Reset()
-    // {
-    //     _field.Bullets.Clear();
-    //     _playerShots.Clear();
-    //     _player.Respawn();
-    // }
+    [Export] public int Lives = 3;
+
+    private BulletField _enemyField = null!;
+    private BulletField _playerField = null!;
+    private Boss _boss = null!;
+    private Player _player = null!;
+    private Hud _hud = null!;
+    private readonly Lives _lives = new();
+
+    public override void _Ready()
+    {
+        _enemyField = GetNode<BulletField>("EnemyField");
+        _playerField = GetNode<BulletField>("PlayerField");
+        _boss = GetNode<Boss>("Boss");
+        _player = GetNode<Player>("Player");
+        _hud = GetNode<Hud>("Hud");
+
+        _lives.GameOver += () => GetTree().ReloadCurrentScene();
+        _lives.Reset(Lives);
+
+        // boss bullets damage the player
+        _enemyField.Target = _player;
+        _enemyField.Hit += _player.Hit;
+        _player.Died += OnPlayerDied;
+
+        // player shots damage the boss
+        _playerField.Target = _boss;
+        _playerField.Hit += _boss.Hit;
+
+        // boss fires its phases into the enemy field and aims at the player
+        _boss.Field = _enemyField;
+        _boss.PlayerTarget = _player;
+        _boss.Defeated += OnBossDefeated;
+
+        foreach (var emitter in _player.FindEmitters())
+        {
+            emitter.Initialize(_playerField, _playerField.Table, _playerField.Styles);
+            emitter.Disable();
+            _player.Emitters.Add(emitter);
+        }
+
+        _boss.Begin();
+
+        // Begin() builds the controller, so bind the HUD after it.
+        _hud.Bind(_boss.Controller, _lives);
+    }
+
+    // Player.Hit runs inside the field's collision iteration, so defer the pool
+    // clear/respawn to avoid mutating the span mid-loop.
+    private void OnPlayerDied() => CallDeferred(MethodName.LoseLife);
+
+    private void LoseLife()
+    {
+        _enemyField.Clear();
+        _lives.Lose();
+
+        // Lives.GameOver reloads the scene on the last life; otherwise respawn.
+        if (_lives.Current > 0)
+            _player.Respawn();
+    }
+
+    private void OnBossDefeated() => GetTree().ReloadCurrentScene();
 }
