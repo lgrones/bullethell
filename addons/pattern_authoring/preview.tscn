@@ -1,13 +1,16 @@
 [gd_scene format=3 uid="uid://dph6wy10nv5h8"]
 
 [ext_resource type="Script" uid="uid://cdr8dgrdhvbyt" path="res://addons/pattern_authoring/PreviewMain.cs" id="1_aad4j"]
-[ext_resource type="PackedScene" uid="uid://c135ks8qkt6aa" path="res://game/actors/enemies/marisa_phase_1.tscn" id="2_aad4j"]
+[ext_resource type="PackedScene" uid="uid://cjg2vxuiirdi2" path="res://game/actors/enemies/marisa/marisa_phase_2.tscn" id="2_aad4j"]
 [ext_resource type="PackedScene" uid="uid://bswteemawxgoy" path="res://game/bullets/bullet_field.tscn" id="2_uvo3e"]
 
 [node name="PreviewMain" type="Node2D" unique_id=1936638775]
 script = ExtResource("1_aad4j")
 
-[node name="Phase" parent="." unique_id=1612727468 instance=ExtResource("2_aad4j")]
+[node name="Phase" parent="." unique_id=1026819739 instance=ExtResource("2_aad4j")]
 
 [node name="BulletField" parent="." unique_id=2001126864 instance=ExtResource("2_uvo3e")]
 MaxBullets = 8000
+
+[node name="Player" type="Node2D" parent="." unique_id=1262598177]
+position = Vector2(6, 395)

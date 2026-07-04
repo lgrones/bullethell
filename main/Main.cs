@@ -1,3 +1,4 @@
+using System.Linq;
 using bullethell.game.actors;
 using bullethell.game.actors.enemies;
 using bullethell.game.bullets;
@@ -25,12 +26,11 @@ public partial class Main : Node2D
     {
         _enemyField = GetNode<BulletField>("EnemyField");
         _playerField = GetNode<BulletField>("PlayerField");
-        _boss = GetNode<Boss>("Boss");
+        _boss = (Boss)GetTree().GetNodesInGroup("bosses").First();
         _player = GetNode<Player>("Player");
         _hud = GetNode<Hud>("Hud");
 
         _lives.GameOver += () => GetTree().ReloadCurrentScene();
-        _lives.Reset(Lives);
 
         // boss bullets damage the player
         _enemyField.Target = _player;
@@ -57,21 +57,17 @@ public partial class Main : Node2D
 
         // Begin() builds the controller, so bind the HUD after it.
         _hud.Bind(_boss.Controller, _lives);
+
+        // Reset after Bind so the HUD catches the initial Changed emit that
+        // builds the life icons.
+        _lives.Reset(Lives);
     }
 
     // Player.Hit runs inside the field's collision iteration, so defer the pool
     // clear/respawn to avoid mutating the span mid-loop.
     private void OnPlayerDied() => CallDeferred(MethodName.LoseLife);
 
-    private void LoseLife()
-    {
-        _enemyField.Clear();
-        _lives.Lose();
-
-        // Lives.GameOver reloads the scene on the last life; otherwise respawn.
-        if (_lives.Current > 0)
-            _player.Respawn();
-    }
+    private void LoseLife() => _lives.Lose();
 
     private void OnBossDefeated() => GetTree().ReloadCurrentScene();
 }

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bvbdatrg16o0s"
-path="res://.godot/imported/Shot_01.png-1e5e768784a77ee522743f438222e63e.ctex"
+uid="uid://vaqecdpwk33y"
+path="res://.godot/imported/nitori_north.png-269d4a4fff8829513b43d0b7fb69fec3.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://game/bullets/rendering/Shot_01.png"
-dest_files=["res://.godot/imported/Shot_01.png-1e5e768784a77ee522743f438222e63e.ctex"]
+source_file="res://assets/nitori/nitori_north.png"
+dest_files=["res://.godot/imported/nitori_north.png-269d4a4fff8829513b43d0b7fb69fec3.ctex"]
 
 [params]
 

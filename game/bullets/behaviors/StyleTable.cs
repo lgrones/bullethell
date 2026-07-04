@@ -18,9 +18,7 @@ public enum RotationMode : byte
 public struct BulletStyle
 {
     public Texture2D? Texture;
-    public Color Tint;
-    public bool Rainbow;
-    public bool Glow;
+    public Material? Material;
     public float Radius;
     public float HitRadius;
     public RotationMode Rotation;
@@ -37,11 +35,10 @@ public sealed class StyleTable
 
     public StyleTable()
     {
-        // id 0 = fallback: no texture -> white quad, plain white.
+        // id 0 = fallback: no texture -> white quad, no material.
         _styles.Add(new BulletStyle
         {
             Texture = null,
-            Tint = Colors.White,
             Radius = 8f,
             HitRadius = 4f,
             Rotation = RotationMode.AlignVelocity,
@@ -64,9 +61,7 @@ public sealed class StyleTable
         _styles.Add(new BulletStyle
         {
             Texture = style.Texture,
-            Tint = style.Color,
-            Rainbow = style.Rainbow,
-            Glow = style.Glow,
+            Material = style.Material,
             Radius = style.Radius,
             HitRadius = style.HitRadius,
             Rotation = style.Rotation,

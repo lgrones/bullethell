@@ -15,9 +15,10 @@ public partial class Player : Node2D, ICollidable
     [Export] public float FocusSpeed = 110f;
     [Export] public float Radius = 8f;
     [Export] public float HitRadius { get; set; } = 3f;
+    [Export] public float InvincibleTime = 2f;
 
     private Vector2 _viewport;
-    private bool _dead;
+    private float _iframes;
     public readonly List<BulletEmitter> Emitters = [];
 
     public override void _Ready()
@@ -30,6 +31,20 @@ public partial class Player : Node2D, ICollidable
 
     public override void _Process(double delta)
     {
+        if (_iframes > 0f)
+        {
+            _iframes -= (float)delta;
+
+            // Blink the sprite ~8x/sec while invincible; Modulate cascades to
+            // the child sprite. Snap back to opaque the moment iframes end.
+            var on = Mathf.PosMod(_iframes, 0.25f) < 0.125f;
+            Modulate = new Color(1f, 1f, 1f, on ? 1f : 0.25f);
+        }
+        else
+        {
+            Modulate = Colors.White;
+        }
+
         Move((float)delta);
 
         if (Input.IsActionJustPressed("fire"))
@@ -50,18 +65,19 @@ public partial class Player : Node2D, ICollidable
 
     public void Respawn()
     {
-        _dead = false;
+        _iframes = 0f;
         Position = new Vector2(_viewport.X * 0.5f, _viewport.Y * 0.8f);
     }
 
-    /// One bullet connected. 1-hit death: emit Died once, then ignore further
-    /// hits until Respawn clears the flag (a wall of bullets costs one life, not many).
+    /// One bullet connected. Costs a life, then grants an invincibility window so
+    /// a wall of bullets costs one life, not many. No reposition — the player
+    /// keeps their spot; only a full reset repositions.
     public void Hit()
     {
-        if (_dead)
+        if (_iframes > 0f)
             return;
 
-        _dead = true;
+        _iframes = InvincibleTime;
         EmitSignal(SignalName.Died);
     }
 

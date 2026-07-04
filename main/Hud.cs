@@ -10,8 +10,7 @@ namespace bullethell.main;
 /// lives on the Boss node (world space), not here.
 public partial class Hud : CanvasLayer
 {
-    private static readonly Texture2D LifeIcon =
-        GD.Load<Texture2D>("res://assets/placeholders/player.png");
+    [Export] private Texture2D? _lifeIcon;
 
     private const int IconSize = 24;
 
@@ -43,11 +42,12 @@ public partial class Hud : CanvasLayer
         {
             var icon = new TextureRect
             {
-                Texture = LifeIcon,
+                Texture = _lifeIcon,
                 ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
                 StretchMode = TextureRect.StretchModeEnum.KeepAspect,
                 CustomMinimumSize = new Vector2(IconSize, IconSize),
             };
+            
             _lifeRow.AddChild(icon);
             _icons.Add(icon);
         }

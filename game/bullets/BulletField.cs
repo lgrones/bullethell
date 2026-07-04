@@ -41,6 +41,9 @@ public sealed partial class BulletField : Node2D, IBulletSink
 
         var viewport = GetViewportRect().Size;
         _bounds = new Rect2(-64, -64, viewport.X + 128, viewport.Y + 128);
+        
+        if (Engine.IsEditorHint())
+            _bounds = new Rect2(-500, -500, 1000, 1000); 
     }
 
     public override void _PhysicsProcess(double delta)

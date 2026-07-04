@@ -1,0 +1,132 @@
+[gd_scene format=3 uid="uid://cjg2vxuiirdi2"]
+
+[ext_resource type="Script" uid="uid://58dian6werok" path="res://game/phases/BossPhase.cs" id="1_am8eb"]
+[ext_resource type="Script" uid="uid://dte8y7ebm5fwc" path="res://game/emitters/EmitterAnchor.cs" id="2_w85rj"]
+[ext_resource type="Script" uid="uid://dlokb3krq7k2u" path="res://game/emitters/BulletEmitter.cs" id="3_2w6jn"]
+[ext_resource type="Script" uid="uid://yvnadlq43i7y" path="res://game/patterns/FrameModifier.cs" id="4_yw7ny"]
+[ext_resource type="Script" uid="uid://b2qg412v5bcq4" path="res://game/patterns/modifiers/Ring.cs" id="5_xcggr"]
+[ext_resource type="Shader" uid="uid://b0q2j6542ahi1" path="res://assets/shaders/rainbow.gdshader" id="6_cuny3"]
+[ext_resource type="Texture2D" uid="uid://bvbdatrg16o0s" path="res://assets/shot_atlas.png" id="7_d0ju4"]
+[ext_resource type="Script" uid="uid://ck6c070qu78do" path="res://game/bullets/behaviors/BulletStyleResource.cs" id="8_f843p"]
+[ext_resource type="Script" uid="uid://ds52o3ol62flm" path="res://game/patterns/shots/StraightShot.cs" id="9_jidyt"]
+[ext_resource type="Script" uid="uid://dbuei2gfylcvv" path="res://game/patterns/Composite.cs" id="10_7hiit"]
+[ext_resource type="Script" uid="uid://c6bir11fkxpde" path="res://game/emitters/cadences/LinearCadence.cs" id="11_c5fcb"]
+[ext_resource type="Script" uid="uid://bskmlbdmx5i53" path="res://game/patterns/shots/AimedShot.cs" id="12_sc8wt"]
+[ext_resource type="Script" uid="uid://baxbt78c51hgd" path="res://game/emitters/cadences/BurstCadence.cs" id="13_qij0j"]
+
+[sub_resource type="Resource" id="Resource_uaugh"]
+script = ExtResource("5_xcggr")
+Count = 9
+metadata/_custom_type_script = "uid://b2qg412v5bcq4"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_50wix"]
+shader = ExtResource("6_cuny3")
+shader_parameter/start_hue = 0.0
+shader_parameter/cycle_speed = 0.1
+shader_parameter/glow_strength = 1.5
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_faup1"]
+atlas = ExtResource("7_d0ju4")
+region = Rect2(578, 33, 28, 29)
+
+[sub_resource type="Resource" id="Resource_806nw"]
+script = ExtResource("8_f843p")
+Radius = 50.0
+HitRadius = 30.0
+Texture = SubResource("AtlasTexture_faup1")
+Material = SubResource("ShaderMaterial_50wix")
+Rotation = 2
+metadata/_custom_type_script = "uid://ck6c070qu78do"
+
+[sub_resource type="Resource" id="Resource_qc6od"]
+script = ExtResource("9_jidyt")
+Style = SubResource("Resource_806nw")
+metadata/_custom_type_script = "uid://ds52o3ol62flm"
+
+[sub_resource type="Resource" id="Resource_5dalj"]
+script = ExtResource("10_7hiit")
+Source = SubResource("Resource_qc6od")
+Modifiers = Array[ExtResource("4_yw7ny")]([SubResource("Resource_uaugh")])
+metadata/_custom_type_script = "uid://dbuei2gfylcvv"
+
+[sub_resource type="Resource" id="Resource_seook"]
+script = ExtResource("11_c5fcb")
+metadata/_custom_type_script = "uid://c6bir11fkxpde"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bcn0w"]
+atlas = ExtResource("7_d0ju4")
+region = Rect2(1223, 647, 50, 50)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bcn0w"]
+shader = ExtResource("6_cuny3")
+shader_parameter/start_hue = 0.30000001425
+shader_parameter/cycle_speed = 0.050000002375
+shader_parameter/glow_strength = 1.5
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_do2ib"]
+atlas = ExtResource("7_d0ju4")
+region = Rect2(578, 33, 28, 29)
+
+[sub_resource type="Resource" id="Resource_v16gm"]
+script = ExtResource("8_f843p")
+Radius = 20.0
+HitRadius = 16.0
+Texture = SubResource("AtlasTexture_do2ib")
+Material = SubResource("ShaderMaterial_bcn0w")
+Rotation = 2
+SpinRate = 8.0
+metadata/_custom_type_script = "uid://ck6c070qu78do"
+
+[sub_resource type="Resource" id="Resource_50wix"]
+script = ExtResource("12_sc8wt")
+Style = SubResource("Resource_v16gm")
+metadata/_custom_type_script = "uid://bskmlbdmx5i53"
+
+[sub_resource type="Resource" id="Resource_e705g"]
+script = ExtResource("13_qij0j")
+ShotsPerBurst = 6
+ShotInterval = 0.1
+RestInterval = 1.9
+metadata/_custom_type_script = "uid://baxbt78c51hgd"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b3i7m"]
+atlas = ExtResource("7_d0ju4")
+region = Rect2(1223, 839, 50, 50)
+
+[node name="Phase" type="Node2D" unique_id=1026819739]
+script = ExtResource("1_am8eb")
+Duration = 20.0
+Hp = 200
+
+[node name="EmitterAnchor" type="Node2D" parent="." unique_id=248096196]
+rotation = 0.25234708
+script = ExtResource("2_w85rj")
+RotationSpeed = 100.0
+
+[node name="Emitter" type="Node2D" parent="EmitterAnchor" unique_id=410584242]
+rotation = 1.0103711
+script = ExtResource("3_2w6jn")
+Pattern = SubResource("Resource_5dalj")
+Cadence = SubResource("Resource_seook")
+
+[node name="EmitterAnchor2" type="Node2D" parent="." unique_id=549918122]
+position = Vector2(250, 0)
+script = ExtResource("2_w85rj")
+
+[node name="Emitter" type="Node2D" parent="EmitterAnchor2" unique_id=1637961206]
+rotation = 1.0103711
+script = ExtResource("3_2w6jn")
+Icon = SubResource("AtlasTexture_bcn0w")
+Pattern = SubResource("Resource_50wix")
+Cadence = SubResource("Resource_e705g")
+
+[node name="EmitterAnchor3" type="Node2D" parent="." unique_id=744131688]
+position = Vector2(-250, 0)
+script = ExtResource("2_w85rj")
+
+[node name="Emitter" type="Node2D" parent="EmitterAnchor3" unique_id=1276899659]
+rotation = 1.0103711
+script = ExtResource("3_2w6jn")
+Icon = SubResource("AtlasTexture_b3i7m")
+Pattern = SubResource("Resource_50wix")
+Cadence = SubResource("Resource_e705g")
