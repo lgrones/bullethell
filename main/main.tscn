@@ -7,7 +7,6 @@
 [ext_resource type="Script" uid="uid://bjon0sreg8b64" path="res://game/actors/Player.cs" id="4_player"]
 [ext_resource type="Script" uid="uid://dlokb3krq7k2u" path="res://game/emitters/BulletEmitter.cs" id="5_emit"]
 [ext_resource type="PackedScene" uid="uid://cjg2vxuiirdi2" path="res://game/actors/enemies/marisa/marisa_phase_2.tscn" id="6_5xyti"]
-[ext_resource type="Script" uid="uid://ds52o3ol62flm" path="res://game/patterns/shots/StraightShot.cs" id="6_straight"]
 [ext_resource type="Script" uid="uid://c6bir11fkxpde" path="res://game/emitters/cadences/LinearCadence.cs" id="7_cad"]
 [ext_resource type="Texture2D" uid="uid://ddmuv4ug0ee0o" path="res://assets/marisa/luna/marisa_0.png" id="7_piupu"]
 [ext_resource type="Texture2D" uid="uid://bvbdatrg16o0s" path="res://assets/shot_atlas.png" id="8_bsumw"]
@@ -19,6 +18,7 @@
 [ext_resource type="Texture2D" uid="uid://duu7lul5mdeyw" path="res://assets/placeholders/background.png" id="12_bg"]
 [ext_resource type="Script" uid="uid://0oeojolbi4ix" path="res://main/Hud.cs" id="13_hud"]
 [ext_resource type="Texture2D" uid="uid://bi4n5omkcu0jv" path="res://assets/heart.png" id="16_n3o0a"]
+[ext_resource type="Script" uid="uid://bskmlbdmx5i53" path="res://game/patterns/shots/AimedShot.cs" id="16_piupu"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_5dalj"]
 animations = [{
@@ -79,27 +79,30 @@ _data = {
 &"hover": SubResource("Animation_q0sk7")
 }
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_g8rhh"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_vapsy"]
 atlas = ExtResource("8_bsumw")
-region = Rect2(19.05047, 177.02042, 9.993469, 15.061249)
+region = Rect2(83, 177, 10, 15)
 
-[sub_resource type="Resource" id="Resource_btxyo"]
+[sub_resource type="Resource" id="Resource_q0sk7"]
 script = ExtResource("9_fwcvl")
-Radius = 16.0
-HitRadius = 16.0
-Texture = SubResource("AtlasTexture_g8rhh")
+Texture = SubResource("AtlasTexture_vapsy")
 metadata/_custom_type_script = "uid://ck6c070qu78do"
 
-[sub_resource type="Resource" id="PlayerShot"]
-script = ExtResource("6_straight")
-Style = SubResource("Resource_btxyo")
-Speed = 700.0
-metadata/_custom_type_script = "uid://ds52o3ol62flm"
+[sub_resource type="Resource" id="Resource_piupu"]
+script = ExtResource("16_piupu")
+Style = SubResource("Resource_q0sk7")
+metadata/_custom_type_script = "uid://bskmlbdmx5i53"
 
 [sub_resource type="Resource" id="PlayerCadence"]
 script = ExtResource("7_cad")
 ShotInterval = 0.06
 metadata/_custom_type_script = "uid://c6bir11fkxpde"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5dalj"]
+size = Vector2(20, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qc6od"]
+size = Vector2(1152, 20)
 
 [node name="Main" type="Node2D" unique_id=588738428]
 script = ExtResource("1_main")
@@ -129,18 +132,22 @@ frame_progress = 0.27236304
 libraries/ = SubResource("AnimationLibrary_vapsy")
 autoplay = &"hover"
 
-[node name="Player" type="Node2D" parent="." unique_id=690024232]
+[node name="Player" type="CharacterBody2D" parent="." unique_id=557867759]
 script = ExtResource("4_player")
 
 [node name="Sprite" type="Sprite2D" parent="Player" unique_id=634743269]
 show_behind_parent = true
 texture = ExtResource("9_5xyti")
 
-[node name="ShotEmitter" type="Node2D" parent="Player" unique_id=494865578]
-rotation = -1.5707964
+[node name="ShotEmitter" type="Node2D" parent="Player" unique_id=494865578 node_paths=PackedStringArray("Target")]
 script = ExtResource("5_emit")
-Pattern = SubResource("PlayerShot")
+Target = NodePath("../../Marisa")
+Pattern = SubResource("Resource_piupu")
 Cadence = SubResource("PlayerCadence")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=1583009012]
+position = Vector2(0, -1)
+shape = SubResource("RectangleShape2D_5dalj")
 
 [node name="Hud" type="CanvasLayer" parent="." unique_id=1102967715]
 script = ExtResource("13_hud")
@@ -170,3 +177,10 @@ offset_bottom = -12.0
 grow_horizontal = 0
 grow_vertical = 0
 alignment = 2
+
+[node name="Floor" type="StaticBody2D" parent="." unique_id=42965673]
+position = Vector2(0, 28.505)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor" unique_id=1329464363]
+position = Vector2(576, 609.495)
+shape = SubResource("RectangleShape2D_qc6od")
