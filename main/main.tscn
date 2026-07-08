@@ -116,6 +116,7 @@ centered = false
 [node name="PlayerField" parent="." unique_id=1839369211 instance=ExtResource("2_field")]
 
 [node name="Marisa" type="Node2D" parent="." unique_id=1219390961 groups=["bosses"]]
+position = Vector2(584, 40)
 script = ExtResource("3_boss")
 HitRadius = 16.0
 Phases = [ExtResource("4_0i4oc"), ExtResource("6_5xyti")]
@@ -133,6 +134,7 @@ libraries/ = SubResource("AnimationLibrary_vapsy")
 autoplay = &"hover"
 
 [node name="Player" type="CharacterBody2D" parent="." unique_id=557867759]
+position = Vector2(576, 546.355)
 script = ExtResource("4_player")
 
 [node name="Sprite" type="Sprite2D" parent="Player" unique_id=634743269]

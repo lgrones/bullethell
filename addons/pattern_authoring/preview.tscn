@@ -1,16 +1,145 @@
 [gd_scene format=3 uid="uid://dph6wy10nv5h8"]
 
 [ext_resource type="Script" uid="uid://cdr8dgrdhvbyt" path="res://addons/pattern_authoring/PreviewMain.cs" id="1_aad4j"]
-[ext_resource type="PackedScene" uid="uid://cjg2vxuiirdi2" path="res://game/actors/enemies/marisa/marisa_phase_2.tscn" id="2_aad4j"]
+[ext_resource type="Script" uid="uid://58dian6werok" path="res://game/phases/BossPhase.cs" id="2_bcn0w"]
 [ext_resource type="PackedScene" uid="uid://bswteemawxgoy" path="res://game/bullets/bullet_field.tscn" id="2_uvo3e"]
+[ext_resource type="Script" uid="uid://dte8y7ebm5fwc" path="res://game/emitters/EmitterAnchor.cs" id="3_do2ib"]
+[ext_resource type="Script" uid="uid://dlokb3krq7k2u" path="res://game/emitters/BulletEmitter.cs" id="4_806nw"]
+[ext_resource type="Script" uid="uid://yvnadlq43i7y" path="res://game/patterns/FrameModifier.cs" id="5_v16gm"]
+[ext_resource type="Script" uid="uid://b2qg412v5bcq4" path="res://game/patterns/modifiers/Ring.cs" id="6_faup1"]
+[ext_resource type="Shader" uid="uid://b0q2j6542ahi1" path="res://assets/shaders/rainbow.gdshader" id="7_seook"]
+[ext_resource type="Texture2D" uid="uid://bvbdatrg16o0s" path="res://assets/shot_atlas.png" id="8_vv8p7"]
+[ext_resource type="Script" uid="uid://ck6c070qu78do" path="res://game/bullets/behaviors/BulletStyleResource.cs" id="9_upukd"]
+[ext_resource type="Script" uid="uid://ds52o3ol62flm" path="res://game/patterns/shots/StraightShot.cs" id="10_6y58b"]
+[ext_resource type="Script" uid="uid://dbuei2gfylcvv" path="res://game/patterns/Composite.cs" id="11_wof1v"]
+[ext_resource type="Script" uid="uid://c6bir11fkxpde" path="res://game/emitters/cadences/LinearCadence.cs" id="12_02h5y"]
+[ext_resource type="Script" uid="uid://bskmlbdmx5i53" path="res://game/patterns/shots/AimedShot.cs" id="13_bow8i"]
+[ext_resource type="Script" uid="uid://baxbt78c51hgd" path="res://game/emitters/cadences/BurstCadence.cs" id="14_garuq"]
+
+[sub_resource type="Resource" id="Resource_uaugh"]
+script = ExtResource("6_faup1")
+Count = 9
+metadata/_custom_type_script = "uid://b2qg412v5bcq4"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_50wix"]
+shader = ExtResource("7_seook")
+shader_parameter/start_hue = 0.0
+shader_parameter/cycle_speed = 0.1
+shader_parameter/glow_strength = 1.5
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_faup1"]
+atlas = ExtResource("8_vv8p7")
+region = Rect2(578, 33, 28, 29)
+
+[sub_resource type="Resource" id="Resource_806nw"]
+script = ExtResource("9_upukd")
+Radius = 50.0
+HitRadius = 30.0
+Texture = SubResource("AtlasTexture_faup1")
+Material = SubResource("ShaderMaterial_50wix")
+Rotation = 2
+metadata/_custom_type_script = "uid://ck6c070qu78do"
+
+[sub_resource type="Resource" id="Resource_qc6od"]
+script = ExtResource("10_6y58b")
+Style = SubResource("Resource_806nw")
+metadata/_custom_type_script = "uid://ds52o3ol62flm"
+
+[sub_resource type="Resource" id="Resource_5dalj"]
+script = ExtResource("11_wof1v")
+Source = SubResource("Resource_qc6od")
+Modifiers = Array[ExtResource("5_v16gm")]([SubResource("Resource_uaugh")])
+metadata/_custom_type_script = "uid://dbuei2gfylcvv"
+
+[sub_resource type="Resource" id="Resource_seook"]
+script = ExtResource("12_02h5y")
+metadata/_custom_type_script = "uid://c6bir11fkxpde"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bcn0w"]
+atlas = ExtResource("8_vv8p7")
+region = Rect2(1223, 647, 50, 50)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bcn0w"]
+shader = ExtResource("7_seook")
+shader_parameter/start_hue = 0.30000001425
+shader_parameter/cycle_speed = 0.050000002375
+shader_parameter/glow_strength = 1.5
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_do2ib"]
+atlas = ExtResource("8_vv8p7")
+region = Rect2(578, 33, 28, 29)
+
+[sub_resource type="Resource" id="Resource_v16gm"]
+script = ExtResource("9_upukd")
+Radius = 20.0
+HitRadius = 16.0
+Texture = SubResource("AtlasTexture_do2ib")
+Material = SubResource("ShaderMaterial_bcn0w")
+Rotation = 2
+SpinRate = 8.0
+metadata/_custom_type_script = "uid://ck6c070qu78do"
+
+[sub_resource type="Resource" id="Resource_50wix"]
+script = ExtResource("13_bow8i")
+Style = SubResource("Resource_v16gm")
+metadata/_custom_type_script = "uid://bskmlbdmx5i53"
+
+[sub_resource type="Resource" id="Resource_e705g"]
+script = ExtResource("14_garuq")
+ShotsPerBurst = 6
+ShotInterval = 0.1
+RestInterval = 1.9
+metadata/_custom_type_script = "uid://baxbt78c51hgd"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b3i7m"]
+atlas = ExtResource("8_vv8p7")
+region = Rect2(1223, 839, 50, 50)
 
 [node name="PreviewMain" type="Node2D" unique_id=1936638775]
 script = ExtResource("1_aad4j")
 
-[node name="Phase" parent="." unique_id=1026819739 instance=ExtResource("2_aad4j")]
+[node name="Phase" type="Node2D" parent="." unique_id=1026819739]
+script = ExtResource("2_bcn0w")
+Duration = 20.0
+Hp = 200
+
+[node name="EmitterAnchor" type="Node2D" parent="Phase" unique_id=248096196]
+rotation = 0.71460927
+script = ExtResource("3_do2ib")
+RotationSpeed = 100.0
+
+[node name="Emitter" type="Node2D" parent="Phase/EmitterAnchor" unique_id=410584242]
+rotation = 1.0103711
+script = ExtResource("4_806nw")
+Pattern = SubResource("Resource_5dalj")
+Cadence = SubResource("Resource_seook")
+
+[node name="EmitterAnchor2" type="Node2D" parent="Phase" unique_id=549918122]
+position = Vector2(250, 0)
+script = ExtResource("3_do2ib")
+
+[node name="Emitter" type="Node2D" parent="Phase/EmitterAnchor2" unique_id=1637961206 node_paths=PackedStringArray("Target")]
+rotation = 1.0103711
+script = ExtResource("4_806nw")
+Target = NodePath("../../../Player")
+Icon = SubResource("AtlasTexture_bcn0w")
+Pattern = SubResource("Resource_50wix")
+Cadence = SubResource("Resource_e705g")
+
+[node name="EmitterAnchor3" type="Node2D" parent="Phase" unique_id=744131688]
+position = Vector2(-250, 0)
+script = ExtResource("3_do2ib")
+
+[node name="Emitter" type="Node2D" parent="Phase/EmitterAnchor3" unique_id=1276899659 node_paths=PackedStringArray("Target")]
+rotation = 1.0103711
+script = ExtResource("4_806nw")
+Target = NodePath("../../../Player")
+Icon = SubResource("AtlasTexture_b3i7m")
+Pattern = SubResource("Resource_50wix")
+Cadence = SubResource("Resource_e705g")
 
 [node name="BulletField" parent="." unique_id=2001126864 instance=ExtResource("2_uvo3e")]
 MaxBullets = 8000
 
 [node name="Player" type="Node2D" parent="." unique_id=1262598177]
-position = Vector2(6, 395)
+position = Vector2(1, 457)
