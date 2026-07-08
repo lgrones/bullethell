@@ -9,13 +9,75 @@
 [ext_resource type="PackedScene" uid="uid://cjg2vxuiirdi2" path="res://game/actors/enemies/marisa/marisa_phase_2.tscn" id="6_5xyti"]
 [ext_resource type="Script" uid="uid://ds52o3ol62flm" path="res://game/patterns/shots/StraightShot.cs" id="6_straight"]
 [ext_resource type="Script" uid="uid://c6bir11fkxpde" path="res://game/emitters/cadences/LinearCadence.cs" id="7_cad"]
+[ext_resource type="Texture2D" uid="uid://ddmuv4ug0ee0o" path="res://assets/marisa/luna/marisa_0.png" id="7_piupu"]
 [ext_resource type="Texture2D" uid="uid://bvbdatrg16o0s" path="res://assets/shot_atlas.png" id="8_bsumw"]
+[ext_resource type="Texture2D" uid="uid://dhw157vl5e4cs" path="res://assets/marisa/luna/marisa_1.png" id="8_q0sk7"]
 [ext_resource type="Texture2D" uid="uid://vaqecdpwk33y" path="res://assets/nitori/nitori_north.png" id="9_5xyti"]
 [ext_resource type="Script" uid="uid://ck6c070qu78do" path="res://game/bullets/behaviors/BulletStyleResource.cs" id="9_fwcvl"]
+[ext_resource type="Texture2D" uid="uid://dldx57o8ruc8a" path="res://assets/marisa/luna/marisa_2.png" id="9_vapsy"]
+[ext_resource type="Texture2D" uid="uid://c75l4jphxhwbc" path="res://assets/marisa/luna/marisa_3.png" id="10_jofbb"]
 [ext_resource type="Texture2D" uid="uid://duu7lul5mdeyw" path="res://assets/placeholders/background.png" id="12_bg"]
 [ext_resource type="Script" uid="uid://0oeojolbi4ix" path="res://main/Hud.cs" id="13_hud"]
-[ext_resource type="Texture2D" uid="uid://blg384ejkrfue" path="res://assets/marisa/marisa_south.png" id="14_marisa"]
 [ext_resource type="Texture2D" uid="uid://bi4n5omkcu0jv" path="res://assets/heart.png" id="16_n3o0a"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_5dalj"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_piupu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_q0sk7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_vapsy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_jofbb")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 8.0
+}]
+
+[sub_resource type="Animation" id="Animation_piupu"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_q0sk7"]
+resource_name = "hover"
+length = 3.0000000000000004
+loop_mode = 1
+step = 0.0333
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.75, 1.5, 2.24, 3),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(8, 3), Vector2(0, 6), Vector2(-8, 3.313), Vector2(0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_vapsy"]
+_data = {
+&"RESET": SubResource("Animation_piupu"),
+&"hover": SubResource("Animation_q0sk7")
+}
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_g8rhh"]
 atlas = ExtResource("8_bsumw")
@@ -52,12 +114,20 @@ centered = false
 
 [node name="Marisa" type="Node2D" parent="." unique_id=1219390961 groups=["bosses"]]
 script = ExtResource("3_boss")
+HitRadius = 16.0
 Phases = [ExtResource("4_0i4oc"), ExtResource("6_5xyti")]
 
-[node name="Sprite" type="Sprite2D" parent="Marisa" unique_id=373970934]
+[node name="Sprite" type="AnimatedSprite2D" parent="Marisa" unique_id=1502225961]
 show_behind_parent = true
-scale = Vector2(0.5, 0.5)
-texture = ExtResource("14_marisa")
+sprite_frames = SubResource("SpriteFrames_5dalj")
+animation = &"idle"
+autoplay = "idle"
+frame = 2
+frame_progress = 0.27236304
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Marisa" unique_id=1529155464]
+libraries/ = SubResource("AnimationLibrary_vapsy")
+autoplay = &"hover"
 
 [node name="Player" type="Node2D" parent="." unique_id=690024232]
 script = ExtResource("4_player")

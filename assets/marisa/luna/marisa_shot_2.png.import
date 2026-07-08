@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://blg384ejkrfue"
-path="res://.godot/imported/marisa_south.png-8e3dd5a1c65b699e48a3d44951e4c435.ctex"
+uid="uid://yit8awxtt8up"
+path="res://.godot/imported/marisa_shot_2.png-17bab3f49fa70e8bc856d8ed4f50796e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/marisa/marisa_south.png"
-dest_files=["res://.godot/imported/marisa_south.png-8e3dd5a1c65b699e48a3d44951e4c435.ctex"]
+source_file="res://assets/marisa/luna/marisa_shot_2.png"
+dest_files=["res://.godot/imported/marisa_shot_2.png-17bab3f49fa70e8bc856d8ed4f50796e.ctex"]
 
 [params]
 
