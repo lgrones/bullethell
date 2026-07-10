@@ -56,7 +56,7 @@ public partial class Main : Node2D
         _boss.Begin();
 
         // Begin() builds the controller, so bind the HUD after it.
-        _hud.Bind(_boss.Controller, _lives);
+        _hud.Bind(_boss.Controller, _player, _lives);
 
         // Reset after Bind so the HUD catches the initial Changed emit that
         // builds the life icons.

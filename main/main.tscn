@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://2gycfvpavqnw"]
+[gd_scene format=4 uid="uid://2gycfvpavqnw"]
 
 [ext_resource type="Script" uid="uid://dg1otn2jcvxmu" path="res://main/Main.cs" id="1_main"]
 [ext_resource type="PackedScene" uid="uid://bswteemawxgoy" path="res://game/bullets/bullet_field.tscn" id="2_field"]
@@ -19,6 +19,7 @@
 [ext_resource type="Script" uid="uid://0oeojolbi4ix" path="res://main/Hud.cs" id="13_hud"]
 [ext_resource type="Texture2D" uid="uid://bi4n5omkcu0jv" path="res://assets/heart.png" id="16_n3o0a"]
 [ext_resource type="Script" uid="uid://bskmlbdmx5i53" path="res://game/patterns/shots/AimedShot.cs" id="16_piupu"]
+[ext_resource type="Texture2D" uid="uid://b5sdfe1l757cj" path="res://assets/placeholders/tile_white.png" id="20_q0sk7"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_5dalj"]
 animations = [{
@@ -101,8 +102,19 @@ metadata/_custom_type_script = "uid://c6bir11fkxpde"
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5dalj"]
 size = Vector2(20, 48)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_qc6od"]
-size = Vector2(1152, 20)
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_vapsy"]
+texture = ExtResource("20_q0sk7")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+
+[sub_resource type="TileSet" id="TileSet_5dalj"]
+tile_size = Vector2i(32, 32)
+physics_layer_0/collision_layer = 1
+sources/0 = SubResource("TileSetAtlasSource_vapsy")
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_uaugh"]
+size = Vector2(48, 614.61)
 
 [node name="Main" type="Node2D" unique_id=588738428]
 script = ExtResource("1_main")
@@ -180,9 +192,26 @@ grow_horizontal = 0
 grow_vertical = 0
 alignment = 2
 
-[node name="Floor" type="StaticBody2D" parent="." unique_id=42965673]
-position = Vector2(0, 28.505)
+[node name="StaminaBar" type="ProgressBar" parent="Hud" unique_id=1176235292]
+offset_left = 366.0
+offset_top = 617.0
+offset_right = 783.0
+offset_bottom = 644.0
+rounded = true
+show_percentage = false
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor" unique_id=1329464363]
-position = Vector2(576, 609.495)
-shape = SubResource("RectangleShape2D_qc6od")
+[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=267216924]
+position = Vector2(-1, 0)
+tile_map_data = PackedByteArray("AAAAABMAAAAAAAAAAAABABMAAAAAAAAAAAACABMAAAAAAAAAAAADABMAAAAAAAAAAAAEABMAAAAAAAAAAAAFABMAAAAAAAAAAAAGABMAAAAAAAAAAAAHABMAAAAAAAAAAAAIABMAAAAAAAAAAAAJABMAAAAAAAAAAAAKABMAAAAAAAAAAAALABMAAAAAAAAAAAAMABMAAAAAAAAAAAANABMAAAAAAAAAAAAOABMAAAAAAAAAAAAPABMAAAAAAAAAAAAQABMAAAAAAAAAAAARABMAAAAAAAAAAAASABMAAAAAAAAAAAATABMAAAAAAAAAAAAUABMAAAAAAAAAAAAVABMAAAAAAAAAAAAWABMAAAAAAAAAAAAXABMAAAAAAAAAAAAYABMAAAAAAAAAAAAZABMAAAAAAAAAAAAaABMAAAAAAAAAAAAbABMAAAAAAAAAAAAcABMAAAAAAAAAAAAdABMAAAAAAAAAAAAeABMAAAAAAAAAAAAfABMAAAAAAAAAAAAgABMAAAAAAAAAAAAhABMAAAAAAAAAAAAiABMAAAAAAAAAAAAjABMAAAAAAAAAAAAjABQAAAAAAAAAAAAiABQAAAAAAAAAAAAhABQAAAAAAAAAAAAgABQAAAAAAAAAAAAfABQAAAAAAAAAAAAeABQAAAAAAAAAAAAdABQAAAAAAAAAAAAcABQAAAAAAAAAAAAbABQAAAAAAAAAAAAaABQAAAAAAAAAAAAZABQAAAAAAAAAAAAYABQAAAAAAAAAAAAXABQAAAAAAAAAAAAWABQAAAAAAAAAAAAVABQAAAAAAAAAAAAUABQAAAAAAAAAAAATABQAAAAAAAAAAAASABQAAAAAAAAAAAARABQAAAAAAAAAAAAQABQAAAAAAAAAAAAPABQAAAAAAAAAAAAOABQAAAAAAAAAAAANABQAAAAAAAAAAAAMABQAAAAAAAAAAAALABQAAAAAAAAAAAAKABQAAAAAAAAAAAAJABQAAAAAAAAAAAAIABQAAAAAAAAAAAAHABQAAAAAAAAAAAAGABQAAAAAAAAAAAAFABQAAAAAAAAAAAAEABQAAAAAAAAAAAADABQAAAAAAAAAAAACABQAAAAAAAAAAAABABQAAAAAAAAAAAAAABQAAAAAAAAAAAA=")
+tile_set = SubResource("TileSet_5dalj")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=584801658]
+position = Vector2(0, 3.78)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=1752778337]
+position = Vector2(-24, 302.915)
+shape = SubResource("RectangleShape2D_uaugh")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D" unique_id=1552332530]
+position = Vector2(1176, 303.22)
+shape = SubResource("RectangleShape2D_uaugh")

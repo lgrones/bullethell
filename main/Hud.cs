@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using bullethell.game.actors;
 using bullethell.game.actors.enemies;
 using bullethell.game.core;
 using Godot;
@@ -15,25 +16,34 @@ public partial class Hud : CanvasLayer
     private const int IconSize = 24;
 
     private ProgressBar _phaseBar = null!;
+    private ProgressBar _staminaBar = null!;
     private HBoxContainer _lifeRow = null!;
     private readonly List<TextureRect> _icons = [];
 
     public override void _Ready()
     {
         _phaseBar = GetNode<ProgressBar>("PhaseBar");
+        _staminaBar = GetNode<ProgressBar>("StaminaBar");
         _lifeRow = GetNode<HBoxContainer>("LifeRow");
     }
 
-    public void Bind(PhaseController controller, Lives lives)
+    public void Bind(PhaseController phaseController, PlayerController playerController, Lives lives)
     {
-        controller.Timer.Ticked += OnTick;
+        phaseController.Timer.Ticked += OnTick;
         lives.Changed += OnLivesChanged;
+        playerController.StaminaChanged += OnStaminaChanged;
     }
 
     private void OnTick(float remaining, float duration)
     {
         _phaseBar.MaxValue = duration;
         _phaseBar.Value = remaining;
+    }
+
+    private void OnStaminaChanged(float current, float max)
+    {
+        _staminaBar.MaxValue = max;
+        _staminaBar.Value = current;
     }
 
     private void OnLivesChanged(int current, int max)

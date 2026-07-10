@@ -17,12 +17,12 @@ public partial class Player : PlayerController, ICollidable
 
     private Vector2 _viewport;
     private float _iframes;
-    private float _dashTime;
-    private float _dashDir;
     public readonly List<BulletEmitter> Emitters = [];
 
     public override void _Ready()
     {
+        base._Ready();
+        
         _viewport = GetViewportRect().Size;
         GetViewport().SizeChanged += () => _viewport = GetViewportRect().Size;
 
@@ -51,14 +51,6 @@ public partial class Player : PlayerController, ICollidable
             Emitters.ForEach(x => x.Disable());
     }
 
-    public override void _PhysicsProcess(double delta)
-    {
-        base._PhysicsProcess(delta);
-        
-        if (IsDashing)
-            _iframes = InvincibleTime;
-    }
-
     public void Respawn()
     {
         _iframes = 0f;
@@ -71,7 +63,7 @@ public partial class Player : PlayerController, ICollidable
     /// keeps their spot; only a full reset repositions.
     public void Hit()
     {
-        if (_iframes > 0f)
+        if (_iframes > 0f || IsDashing)
             return;
 
         _iframes = InvincibleTime;
