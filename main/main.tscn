@@ -1,6 +1,6 @@
 [gd_scene format=4 uid="uid://2gycfvpavqnw"]
 
-[ext_resource type="Script" uid="uid://dg1otn2jcvxmu" path="res://main/Main.cs" id="1_main"]
+[ext_resource type="Script" uid="uid://b1pbfjfkmugkd" path="res://main/World.cs" id="1_vapsy"]
 [ext_resource type="PackedScene" uid="uid://bswteemawxgoy" path="res://game/bullets/bullet_field.tscn" id="2_field"]
 [ext_resource type="Script" uid="uid://clqyk3nrh0can" path="res://game/actors/enemies/Boss.cs" id="3_boss"]
 [ext_resource type="PackedScene" uid="uid://c135ks8qkt6aa" path="res://game/actors/enemies/marisa/marisa_phase_1.tscn" id="4_0i4oc"]
@@ -15,11 +15,40 @@
 [ext_resource type="Script" uid="uid://ck6c070qu78do" path="res://game/bullets/behaviors/BulletStyleResource.cs" id="9_fwcvl"]
 [ext_resource type="Texture2D" uid="uid://dldx57o8ruc8a" path="res://assets/marisa/luna/marisa_2.png" id="9_vapsy"]
 [ext_resource type="Texture2D" uid="uid://c75l4jphxhwbc" path="res://assets/marisa/luna/marisa_3.png" id="10_jofbb"]
+[ext_resource type="Script" uid="uid://blwgm1hyp6xio" path="res://game/rooms/MarisaBossRoom.cs" id="10_re7it"]
 [ext_resource type="Texture2D" uid="uid://duu7lul5mdeyw" path="res://assets/placeholders/background.png" id="12_bg"]
+[ext_resource type="Script" uid="uid://dyfv5lerq8k6x" path="res://game/rooms/TutorialRoom.cs" id="12_oagth"]
 [ext_resource type="Script" uid="uid://0oeojolbi4ix" path="res://main/Hud.cs" id="13_hud"]
+[ext_resource type="TileSet" uid="uid://dti74p5yke3xy" path="res://game/rooms/floor_tileset.tres" id="13_oagth"]
 [ext_resource type="Texture2D" uid="uid://bi4n5omkcu0jv" path="res://assets/heart.png" id="16_n3o0a"]
 [ext_resource type="Script" uid="uid://bskmlbdmx5i53" path="res://game/patterns/shots/AimedShot.cs" id="16_piupu"]
-[ext_resource type="Texture2D" uid="uid://b5sdfe1l757cj" path="res://assets/placeholders/tile_white.png" id="20_q0sk7"]
+[ext_resource type="Script" uid="uid://c3slcgwolo6w2" path="res://game/core/FollowCamera.cs" id="21_vapsy"]
+[ext_resource type="Script" uid="uid://wtrfhhwji8mw" path="res://main/MainMenu.cs" id="24_oagth"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vapsy"]
+atlas = ExtResource("8_bsumw")
+region = Rect2(83, 177, 10, 15)
+
+[sub_resource type="Resource" id="Resource_q0sk7"]
+script = ExtResource("9_fwcvl")
+Texture = SubResource("AtlasTexture_vapsy")
+metadata/_custom_type_script = "uid://ck6c070qu78do"
+
+[sub_resource type="Resource" id="Resource_piupu"]
+script = ExtResource("16_piupu")
+Style = SubResource("Resource_q0sk7")
+metadata/_custom_type_script = "uid://bskmlbdmx5i53"
+
+[sub_resource type="Resource" id="PlayerCadence"]
+script = ExtResource("7_cad")
+ShotInterval = 0.06
+metadata/_custom_type_script = "uid://c6bir11fkxpde"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5dalj"]
+size = Vector2(20, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_eg570"]
+size = Vector2(16, 360)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_5dalj"]
 animations = [{
@@ -80,88 +109,19 @@ _data = {
 &"hover": SubResource("Animation_q0sk7")
 }
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_vapsy"]
-atlas = ExtResource("8_bsumw")
-region = Rect2(83, 177, 10, 15)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_e705g"]
+size = Vector2(16, 360)
 
-[sub_resource type="Resource" id="Resource_q0sk7"]
-script = ExtResource("9_fwcvl")
-Texture = SubResource("AtlasTexture_vapsy")
-metadata/_custom_type_script = "uid://ck6c070qu78do"
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_n53tw"]
+size = Vector2(16, 360)
 
-[sub_resource type="Resource" id="Resource_piupu"]
-script = ExtResource("16_piupu")
-Style = SubResource("Resource_q0sk7")
-metadata/_custom_type_script = "uid://bskmlbdmx5i53"
-
-[sub_resource type="Resource" id="PlayerCadence"]
-script = ExtResource("7_cad")
-ShotInterval = 0.06
-metadata/_custom_type_script = "uid://c6bir11fkxpde"
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_5dalj"]
-size = Vector2(20, 48)
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_vapsy"]
-texture = ExtResource("20_q0sk7")
-texture_region_size = Vector2i(32, 32)
-0:0/0 = 0
-0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
-
-[sub_resource type="TileSet" id="TileSet_5dalj"]
-tile_size = Vector2i(32, 32)
-physics_layer_0/collision_layer = 1
-sources/0 = SubResource("TileSetAtlasSource_vapsy")
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_uaugh"]
-size = Vector2(48, 614.61)
-
-[node name="Main" type="Node2D" unique_id=588738428]
-script = ExtResource("1_main")
+[node name="World" type="Node2D" unique_id=588738428]
+script = ExtResource("1_vapsy")
 
 [node name="Background" type="Sprite2D" parent="." unique_id=1317484328]
+scale = Vector2(1.1095679, 1.1095679)
 texture = ExtResource("12_bg")
 centered = false
-
-[node name="EnemyField" parent="." unique_id=1227888849 instance=ExtResource("2_field")]
-
-[node name="PlayerField" parent="." unique_id=1839369211 instance=ExtResource("2_field")]
-
-[node name="Marisa" type="Node2D" parent="." unique_id=1219390961 groups=["bosses"]]
-position = Vector2(584, 40)
-script = ExtResource("3_boss")
-HitRadius = 16.0
-Phases = [ExtResource("4_0i4oc"), ExtResource("6_5xyti")]
-
-[node name="Sprite" type="AnimatedSprite2D" parent="Marisa" unique_id=1502225961]
-show_behind_parent = true
-sprite_frames = SubResource("SpriteFrames_5dalj")
-animation = &"idle"
-autoplay = "idle"
-frame = 2
-frame_progress = 0.27236304
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Marisa" unique_id=1529155464]
-libraries/ = SubResource("AnimationLibrary_vapsy")
-autoplay = &"hover"
-
-[node name="Player" type="CharacterBody2D" parent="." unique_id=557867759]
-position = Vector2(576, 546.355)
-script = ExtResource("4_player")
-
-[node name="Sprite" type="Sprite2D" parent="Player" unique_id=634743269]
-show_behind_parent = true
-texture = ExtResource("9_5xyti")
-
-[node name="ShotEmitter" type="Node2D" parent="Player" unique_id=494865578 node_paths=PackedStringArray("Target")]
-script = ExtResource("5_emit")
-Target = NodePath("../../Marisa")
-Pattern = SubResource("Resource_piupu")
-Cadence = SubResource("PlayerCadence")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=1583009012]
-position = Vector2(0, -1)
-shape = SubResource("RectangleShape2D_5dalj")
 
 [node name="Hud" type="CanvasLayer" parent="." unique_id=1102967715]
 script = ExtResource("13_hud")
@@ -193,25 +153,148 @@ grow_vertical = 0
 alignment = 2
 
 [node name="StaminaBar" type="ProgressBar" parent="Hud" unique_id=1176235292]
-offset_left = 366.0
-offset_top = 617.0
-offset_right = 783.0
-offset_bottom = 644.0
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -208.5
+offset_top = -27.0
+offset_right = 208.5
+grow_horizontal = 2
+grow_vertical = 0
 rounded = true
 show_percentage = false
 
-[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=267216924]
-position = Vector2(-1, 0)
-tile_map_data = PackedByteArray("AAAAABMAAAAAAAAAAAABABMAAAAAAAAAAAACABMAAAAAAAAAAAADABMAAAAAAAAAAAAEABMAAAAAAAAAAAAFABMAAAAAAAAAAAAGABMAAAAAAAAAAAAHABMAAAAAAAAAAAAIABMAAAAAAAAAAAAJABMAAAAAAAAAAAAKABMAAAAAAAAAAAALABMAAAAAAAAAAAAMABMAAAAAAAAAAAANABMAAAAAAAAAAAAOABMAAAAAAAAAAAAPABMAAAAAAAAAAAAQABMAAAAAAAAAAAARABMAAAAAAAAAAAASABMAAAAAAAAAAAATABMAAAAAAAAAAAAUABMAAAAAAAAAAAAVABMAAAAAAAAAAAAWABMAAAAAAAAAAAAXABMAAAAAAAAAAAAYABMAAAAAAAAAAAAZABMAAAAAAAAAAAAaABMAAAAAAAAAAAAbABMAAAAAAAAAAAAcABMAAAAAAAAAAAAdABMAAAAAAAAAAAAeABMAAAAAAAAAAAAfABMAAAAAAAAAAAAgABMAAAAAAAAAAAAhABMAAAAAAAAAAAAiABMAAAAAAAAAAAAjABMAAAAAAAAAAAAjABQAAAAAAAAAAAAiABQAAAAAAAAAAAAhABQAAAAAAAAAAAAgABQAAAAAAAAAAAAfABQAAAAAAAAAAAAeABQAAAAAAAAAAAAdABQAAAAAAAAAAAAcABQAAAAAAAAAAAAbABQAAAAAAAAAAAAaABQAAAAAAAAAAAAZABQAAAAAAAAAAAAYABQAAAAAAAAAAAAXABQAAAAAAAAAAAAWABQAAAAAAAAAAAAVABQAAAAAAAAAAAAUABQAAAAAAAAAAAATABQAAAAAAAAAAAASABQAAAAAAAAAAAARABQAAAAAAAAAAAAQABQAAAAAAAAAAAAPABQAAAAAAAAAAAAOABQAAAAAAAAAAAANABQAAAAAAAAAAAAMABQAAAAAAAAAAAALABQAAAAAAAAAAAAKABQAAAAAAAAAAAAJABQAAAAAAAAAAAAIABQAAAAAAAAAAAAHABQAAAAAAAAAAAAGABQAAAAAAAAAAAAFABQAAAAAAAAAAAAEABQAAAAAAAAAAAADABQAAAAAAAAAAAACABQAAAAAAAAAAAABABQAAAAAAAAAAAAAABQAAAAAAAAAAAA=")
-tile_set = SubResource("TileSet_5dalj")
+[node name="Player" type="CharacterBody2D" parent="." unique_id=557867759]
+position = Vector2(295.83337, 280.7589)
+script = ExtResource("4_player")
 
-[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=584801658]
-position = Vector2(0, 3.78)
+[node name="Sprite" type="Sprite2D" parent="Player" unique_id=634743269]
+show_behind_parent = true
+texture = ExtResource("9_5xyti")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=1752778337]
-position = Vector2(-24, 302.915)
-shape = SubResource("RectangleShape2D_uaugh")
+[node name="ShotEmitter" type="Node2D" parent="Player" unique_id=494865578 node_paths=PackedStringArray("Target")]
+script = ExtResource("5_emit")
+Target = NodePath("../../Rooms/MarisaBossRoom/Marisa")
+Pattern = SubResource("Resource_piupu")
+Cadence = SubResource("PlayerCadence")
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D" unique_id=1552332530]
-position = Vector2(1176, 303.22)
-shape = SubResource("RectangleShape2D_uaugh")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=1583009012]
+position = Vector2(0, -1)
+shape = SubResource("RectangleShape2D_5dalj")
+
+[node name="Rooms" type="Node2D" parent="." unique_id=408601009]
+
+[node name="TutorialRoom" type="Node2D" parent="Rooms" unique_id=926586749]
+script = ExtResource("12_oagth")
+
+[node name="TileMapLayer" type="TileMapLayer" parent="Rooms/TutorialRoom" unique_id=513301995]
+tile_map_data = PackedByteArray("AAAAAAoAAAAAAAAAAAABAAoAAAAAAAAAAAACAAoAAAAAAAAAAAADAAoAAAAAAAAAAAAEAAoAAAAAAAAAAAAFAAoAAAAAAAAAAAAGAAoAAAAAAAAAAAAHAAoAAAAAAAAAAAAIAAoAAAAAAAAAAAAJAAoAAAAAAAAAAAAKAAoAAAAAAAAAAAALAAoAAAAAAAAAAAAMAAoAAAAAAAAAAAANAAoAAAAAAAAAAAAOAAoAAAAAAAAAAAAPAAoAAAAAAAAAAAAQAAoAAAAAAAAAAAARAAoAAAAAAAAAAAASAAoAAAAAAAAAAAATAAoAAAAAAAAAAAA=")
+tile_set = ExtResource("13_oagth")
+
+[node name="LeftWall" type="StaticBody2D" parent="Rooms/TutorialRoom" unique_id=351113557]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rooms/TutorialRoom/LeftWall" unique_id=902609531]
+position = Vector2(0, 180)
+shape = SubResource("RectangleShape2D_eg570")
+
+[node name="MarisaBossRoom" type="Node2D" parent="Rooms" unique_id=1485467624]
+position = Vector2(640, 0)
+script = ExtResource("10_re7it")
+
+[node name="Marisa" type="Node2D" parent="Rooms/MarisaBossRoom" unique_id=1219390961 groups=["bosses"]]
+position = Vector2(320, 56)
+script = ExtResource("3_boss")
+HitRadius = 16.0
+Phases = [ExtResource("4_0i4oc"), ExtResource("6_5xyti")]
+
+[node name="Sprite" type="AnimatedSprite2D" parent="Rooms/MarisaBossRoom/Marisa" unique_id=1502225961]
+show_behind_parent = true
+sprite_frames = SubResource("SpriteFrames_5dalj")
+animation = &"idle"
+autoplay = "idle"
+frame = 2
+frame_progress = 0.27236304
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Rooms/MarisaBossRoom/Marisa" unique_id=1529155464]
+libraries/ = SubResource("AnimationLibrary_vapsy")
+autoplay = &"hover"
+
+[node name="TileMapLayer" type="TileMapLayer" parent="Rooms/MarisaBossRoom" unique_id=846234476]
+tile_map_data = PackedByteArray("AAAAAAoAAAAAAAAAAAABAAoAAAAAAAAAAAACAAoAAAAAAAAAAAADAAoAAAAAAAAAAAAEAAoAAAAAAAAAAAAFAAoAAAAAAAAAAAAGAAoAAAAAAAAAAAAHAAoAAAAAAAAAAAAIAAoAAAAAAAAAAAAJAAoAAAAAAAAAAAAKAAoAAAAAAAAAAAALAAoAAAAAAAAAAAAMAAoAAAAAAAAAAAANAAoAAAAAAAAAAAAOAAoAAAAAAAAAAAAPAAoAAAAAAAAAAAAQAAoAAAAAAAAAAAARAAoAAAAAAAAAAAASAAoAAAAAAAAAAAATAAoAAAAAAAAAAAA=")
+tile_set = ExtResource("13_oagth")
+
+[node name="LeftSeal" type="StaticBody2D" parent="Rooms/MarisaBossRoom" unique_id=941273671]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rooms/MarisaBossRoom/LeftSeal" unique_id=501373769]
+position = Vector2(0, 180)
+shape = SubResource("RectangleShape2D_e705g")
+disabled = true
+
+[node name="RightWall" type="StaticBody2D" parent="Rooms/MarisaBossRoom" unique_id=55615229]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rooms/MarisaBossRoom/RightWall" unique_id=494280320]
+position = Vector2(640, 180)
+shape = SubResource("RectangleShape2D_n53tw")
+
+[node name="Camera" type="Camera2D" parent="." unique_id=2037984078 node_paths=PackedStringArray("_target")]
+position = Vector2(320, 180)
+script = ExtResource("21_vapsy")
+_target = NodePath("../Player")
+
+[node name="EnemyField" parent="." unique_id=1227888849 node_paths=PackedStringArray("Target") instance=ExtResource("2_field")]
+Target = NodePath("../Player")
+
+[node name="PlayerField" parent="." unique_id=1839369211 node_paths=PackedStringArray("Target") instance=ExtResource("2_field")]
+Target = NodePath("../Rooms/MarisaBossRoom/Marisa")
+
+[node name="Menu" type="CanvasLayer" parent="." unique_id=1732504289]
+script = ExtResource("24_oagth")
+
+[node name="Root" type="Control" parent="Menu" unique_id=568462428]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="Menu/Root" unique_id=1053347722]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.4)
+
+[node name="CenterContainer" type="CenterContainer" parent="Menu/Root" unique_id=433173410]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Menu/Root/CenterContainer" unique_id=1653987084]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Menu/Root/CenterContainer/VBoxContainer" unique_id=1952233742]
+layout_mode = 2
+text = "Touhou Fan Game (WIP)"
+
+[node name="Play" type="Button" parent="Menu/Root/CenterContainer/VBoxContainer" unique_id=1788057613]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Play"
+
+[node name="Options" type="Button" parent="Menu/Root/CenterContainer/VBoxContainer" unique_id=1907230493]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Options"
+
+[node name="Quit" type="Button" parent="Menu/Root/CenterContainer/VBoxContainer" unique_id=2035183872]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Quit"

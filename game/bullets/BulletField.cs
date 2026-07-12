@@ -39,16 +39,18 @@ public sealed partial class BulletField : Node2D, IBulletSink
         _cull = new CullSystem(Styles);
         _render = new RenderSystem(this, Styles, MaxBullets);
 
-        var viewport = GetViewportRect().Size;
-        _bounds = new Rect2(-64, -64, viewport.X + 128, viewport.Y + 128);
-        
         if (Engine.IsEditorHint())
-            _bounds = new Rect2(-500, -500, 1000, 1000); 
+            _bounds = new Rect2(-500, -500, 1000, 1000);
     }
 
     public override void _PhysicsProcess(double delta)
     {
         _time += (float)delta;
+
+        // Bullets live in world coords; cull against what the camera sees so the
+        // bounds follow the active room no matter where it sits in the world.
+        if (!Engine.IsEditorHint())
+            _bounds = VisibleWorldBounds();
 
         var frame = new BulletFrame(
             (float)delta,
@@ -72,6 +74,17 @@ public sealed partial class BulletField : Node2D, IBulletSink
     {
         if (Engine.IsEditorHint())
             DrawRect(_bounds, Colors.Red, filled: false);
+    }
+
+    /// The camera's visible world rect, grown so a bullet lives until it's fully
+    /// off-screen. Following the view keeps culling correct wherever the room is.
+    private Rect2 VisibleWorldBounds()
+    {
+        var toWorld = GetViewport().CanvasTransform.AffineInverse();
+        var size = GetViewportRect().Size;
+        var topLeft = toWorld * Vector2.Zero;
+        var bottomRight = toWorld * size;
+        return new Rect2(topLeft, bottomRight - topLeft).Grow(64f);
     }
 
     public void SpawnBullet(in BulletSpawn bullet) => _pool.SpawnBullet(bullet);

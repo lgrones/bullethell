@@ -32,7 +32,10 @@ public sealed class CollisionSystem : IBulletSystem
             ref var bullet = ref span[i];
             var hitRadius = styles[bullet.StyleId].HitRadius;
 
-            if (!ICollidable.Overlaps(Target.Position, Target.HitRadius, bullet.Position, hitRadius))
+            // frame.Target is the target's world position; Target.Position is the
+            // node's local one, which only matches when its parent sits at origin.
+            // Rooms are offset, so the boss's local pos is wrong — use the world one.
+            if (!ICollidable.Overlaps(frame.Target, Target.HitRadius, bullet.Position, hitRadius))
                 continue;
 
             bullet.Alive = false;

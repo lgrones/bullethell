@@ -22,15 +22,9 @@ public partial class Boss : Node2D, ICollidable
     public Node2D? PlayerTarget;
 
     /// The fight's signal hub — Main hands this to the HUD. Built in Begin().
-    public PhaseController Controller { get; private set; } = null!;
+    public PhaseController? Controller { get; private set; }
 
     private BossPhase? _phase;
-
-    public override void _Ready()
-    {
-        var viewport = GetViewportRect().Size;
-        Position = new Vector2(viewport.X * 0.5f, viewport.Y * 0.15f);
-    }
 
     /// Kicks off phase 0. Called by Main after Field is wired (Boss._Ready runs
     /// before Main._Ready, so this can't live in _Ready).
@@ -44,10 +38,18 @@ public partial class Boss : Node2D, ICollidable
     }
 
     public override void _Process(double delta)
-        => Controller.Update((float)delta);
+    {
+        if (Controller == null)                                                                                 
+            return;  
+        
+        Controller.Update((float)delta);
+    }
 
     public override void _Draw()
     {
+        if (Controller == null)                                                                                 
+            return;
+        
         DrawArc(Vector2.Zero, HpRingRadius, 0f, Mathf.Tau, 48,
             new Color(0f, 0f, 0f, 0.35f), 5f, true);
 
@@ -58,7 +60,7 @@ public partial class Boss : Node2D, ICollidable
     }
 
     /// One bullet connected. Drains phase HP; the controller advances when it empties.
-    public void Hit() => Controller.Damage();
+    public void Hit() => Controller?.Damage();
 
     /// Controller entered a phase: swap in its scene, wire emitters, feed its HP/duration.
     private void OnPhaseEntered(int index)
@@ -79,6 +81,6 @@ public partial class Boss : Node2D, ICollidable
         }
 
         _phase = phase;
-        Controller.Configure((int)phase.Hp, phase.Duration);
+        Controller?.Configure((int)phase.Hp, phase.Duration);
     }
 }
