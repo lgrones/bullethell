@@ -11,7 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://ddmuv4ug0ee0o" path="res://assets/marisa/luna/marisa_0.png" id="7_piupu"]
 [ext_resource type="Texture2D" uid="uid://bvbdatrg16o0s" path="res://assets/shot_atlas.png" id="8_bsumw"]
 [ext_resource type="Texture2D" uid="uid://dhw157vl5e4cs" path="res://assets/marisa/luna/marisa_1.png" id="8_q0sk7"]
-[ext_resource type="Texture2D" uid="uid://vaqecdpwk33y" path="res://assets/nitori/nitori_north.png" id="9_5xyti"]
+[ext_resource type="Texture2D" uid="uid://bq74r0akaseom" path="res://assets/nitori/kappa_mech.png" id="9_5xyti"]
 [ext_resource type="Script" uid="uid://ck6c070qu78do" path="res://game/bullets/behaviors/BulletStyleResource.cs" id="9_fwcvl"]
 [ext_resource type="Texture2D" uid="uid://dldx57o8ruc8a" path="res://assets/marisa/luna/marisa_2.png" id="9_vapsy"]
 [ext_resource type="Texture2D" uid="uid://c75l4jphxhwbc" path="res://assets/marisa/luna/marisa_3.png" id="10_jofbb"]

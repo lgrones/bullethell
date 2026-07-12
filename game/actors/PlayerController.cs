@@ -27,6 +27,7 @@ public partial class PlayerController : CharacterBody2D
     private float _dashTime;
     private float _currentStamina;
     private DashDirection _directionBuffer;
+    private Sprite2D _sprite;
 
     protected bool IsDashing => _dashTime > 0f;
 
@@ -34,6 +35,7 @@ public partial class PlayerController : CharacterBody2D
     {
         _currentStamina = _maxStamina;
         _directionBuffer = DashDirection.Right;
+        _sprite = GetNode<Sprite2D>("Sprite");
     }
 
     public override void _PhysicsProcess(double delta)
@@ -61,6 +63,9 @@ public partial class PlayerController : CharacterBody2D
     {
         var direction = Input.GetAxis(MoveLeft, MoveRight);
         _directionBuffer = DashDirection.FromSignOrDefault(Mathf.Sign(direction), _directionBuffer);
+
+        // Art faces right; mirror it when the last committed heading is leftward.
+        _sprite.FlipH = _directionBuffer < 0f;
 
         var staminaBefore = _currentStamina;
 
