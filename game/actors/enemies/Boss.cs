@@ -17,19 +17,20 @@ public partial class Boss : Node2D, ICollidable
     [Export] public float HpRingRadius = 60f;
     [Export] public PackedScene[] Phases = [];
 
-    /// Field the phase emitters fire into, and the player they aim at. Set by Main.
-    public BulletField Field = null!;
-    public Node2D? PlayerTarget;
-
     /// The fight's signal hub — Main hands this to the HUD. Built in Begin().
     public PhaseController? Controller { get; private set; }
 
+    private BulletField _field = null!;
+    private Node2D? _playerTarget;
     private BossPhase? _phase;
 
-    /// Kicks off phase 0. Called by Main after Field is wired (Boss._Ready runs
-    /// before Main._Ready, so this can't live in _Ready).
-    public void Begin()
+    /// Kicks off phase 0 against the field it fires into and the player it aims at.
+    /// Called by the room once the field is wired (Boss._Ready runs before the
+    /// room's Enter, so this can't live in _Ready).
+    public void Begin(BulletField field, Node2D playerTarget)
     {
+        _field = field;
+        _playerTarget = playerTarget;
         Controller = new PhaseController(Phases.Length);
         Controller.PhaseEntered += OnPhaseEntered;
         Controller.Defeated += () => EmitSignal(SignalName.Defeated);
@@ -39,17 +40,17 @@ public partial class Boss : Node2D, ICollidable
 
     public override void _Process(double delta)
     {
-        if (Controller == null)                                                                                 
-            return;  
-        
+        if (Controller == null)
+            return;
+
         Controller.Update((float)delta);
     }
 
     public override void _Draw()
     {
-        if (Controller == null)                                                                                 
+        if (Controller == null)
             return;
-        
+
         DrawArc(Vector2.Zero, HpRingRadius, 0f, Mathf.Tau, 48,
             new Color(0f, 0f, 0f, 0.35f), 5f, true);
 
@@ -68,7 +69,7 @@ public partial class Boss : Node2D, ICollidable
         if (_phase is not null)
         {
             _phase.QueueFree();
-            Field.Clear();
+            _field.Clear();
         }
 
         var phase = Phases[index].Instantiate<BossPhase>();
@@ -76,8 +77,8 @@ public partial class Boss : Node2D, ICollidable
 
         foreach (var emitter in phase.FindEmitters())
         {
-            emitter.Target = PlayerTarget;
-            emitter.Initialize(Field, Field.Table, Field.Styles);
+            emitter.Target = _playerTarget;
+            emitter.Initialize(_field, _field.Table, _field.Styles);
         }
 
         _phase = phase;

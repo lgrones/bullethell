@@ -41,7 +41,7 @@ public partial class World : Node2D
         _menu = GetNode<MainMenu>("Menu");
 
         _lives.GameOver += () => GetTree().ReloadCurrentScene();
-        _player.Died += OnPlayerDied;
+        _player.LifeLost += OnLifeLost;
         _menu.StartRequested += StartGame;
 
         foreach (var child in _roomHost.GetChildren())
@@ -62,34 +62,34 @@ public partial class World : Node2D
 
     public override void _Process(double delta)
     {
-        var next = _current + 1;
-        if (next >= _rooms.Count)
+        var nextRoom = _current + 1;
+        if (nextRoom >= _rooms.Count)
             return;
 
         // activate the next room once the player is a little past its left edge
-        if (_player.GlobalPosition.X < _rooms[next].Position.X + EntryMargin)
+        if (_player.GlobalPosition.X < _rooms[nextRoom].Position.X + EntryMargin)
             return;
 
-        EnterRoom(next);
+        EnterRoom(nextRoom);
     }
 
-    private void EnterRoom(int i)
+    private void EnterRoom(int roomIndex)
     {
-        _current = i;
-        var room = _rooms[i];
-        var left = room.Position.X;
+        _current = roomIndex;
+        var room = _rooms[roomIndex];
+        var leftEdge = room.Position.X;
 
-        _camera.SetLimits(left, left + room.Width);   // lock/pan the view to this room
-        room.Cleared += () => OnRoomCleared(i);
-        room.Enter(new RoomContext(_player, _hud, _lives, _enemyField, _playerField));
+        _camera.SetLimits(leftEdge, leftEdge + room.Width);   // lock/pan the view to this room
+        room.Cleared += () => OnRoomCleared(roomIndex);
+        room.Enter(new RoomContext(_player, _hud, _lives, _enemyField, _playerField, Lives));
     }
 
     // Player.Hit fires inside the field's collision iteration; defer the life
     // loss so the pool clear/respawn doesn't mutate the span mid-loop.
-    private void OnPlayerDied() => CallDeferred(MethodName.LoseLife);
+    private void OnLifeLost() => CallDeferred(MethodName.LoseLife);
 
     private void LoseLife() => _lives.Lose();
 
-    // Last room cleared -> reset for now. Later: open the exit to room i+1.
-    private void OnRoomCleared(int i) => GetTree().ReloadCurrentScene();
+    // Last room cleared -> reset for now. Later: open the exit to room roomIndex + 1.
+    private void OnRoomCleared(int roomIndex) => GetTree().ReloadCurrentScene();
 }

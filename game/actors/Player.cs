@@ -7,13 +7,16 @@ namespace bullethell.game.actors;
 
 public partial class Player : PlayerController, ICollidable
 {
-    /// Raised when a bullet connects. Main clears the field and respawns/ends.
+    /// Raised each time a bullet connects (costs a life, not necessarily fatal).
+    /// World turns it into a life loss and resets once the last one is spent.
     [Signal]
-    public delegate void DiedEventHandler();
-    
+    public delegate void LifeLostEventHandler();
+
     [Export] public float Radius = 8f;
     [Export] public float HitRadius { get; set; } = 3f;
     [Export] public float InvincibleTime = 2f;
+
+    private static readonly StringName Fire = "fire";
 
     private Vector2 _viewport;
     private float _iframes;
@@ -45,9 +48,9 @@ public partial class Player : PlayerController, ICollidable
             Modulate = Colors.White;
         }
 
-        if (Input.IsActionJustPressed("fire"))
+        if (Input.IsActionJustPressed(Fire))
             Emitters.ForEach(x => x.Enable());
-        else if (Input.IsActionJustReleased("fire"))
+        else if (Input.IsActionJustReleased(Fire))
             Emitters.ForEach(x => x.Disable());
     }
 
@@ -67,6 +70,6 @@ public partial class Player : PlayerController, ICollidable
             return;
 
         _iframes = InvincibleTime;
-        EmitSignal(SignalName.Died);
+        EmitSignal(SignalName.LifeLost);
     }
 }

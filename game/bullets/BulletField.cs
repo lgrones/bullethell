@@ -29,7 +29,8 @@ public sealed partial class BulletField : Node2D, IBulletSink
     private CullSystem _cull = null!;
     private RenderSystem _render = null!;
     private Rect2 _bounds;
-    private float _time;
+    // Accumulate as double so long sessions don't coarsen the Spin rotation phase.
+    private double _time;
 
     public override void _Ready()
     {
@@ -45,7 +46,7 @@ public sealed partial class BulletField : Node2D, IBulletSink
 
     public override void _PhysicsProcess(double delta)
     {
-        _time += (float)delta;
+        _time += delta;
 
         // Bullets live in world coords; cull against what the camera sees so the
         // bounds follow the active room no matter where it sits in the world.
@@ -54,7 +55,7 @@ public sealed partial class BulletField : Node2D, IBulletSink
 
         var frame = new BulletFrame(
             (float)delta,
-            _time,
+            (float)_time,
             Target?.GlobalPosition ?? Vector2.Zero,
             Target is not null,
             _bounds);
@@ -68,12 +69,6 @@ public sealed partial class BulletField : Node2D, IBulletSink
         _cull.Run(_pool, frame);        // bounds -> dead
         _pool.Compact();                // drop dead
         _render.Run(_pool, frame);      // draw survivors
-    }
-
-    public override void _Draw()
-    {
-        if (Engine.IsEditorHint())
-            DrawRect(_bounds, Colors.Red, filled: false);
     }
 
     /// The camera's visible world rect, grown so a bullet lives until it's fully

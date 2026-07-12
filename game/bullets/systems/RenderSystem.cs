@@ -43,8 +43,8 @@ public sealed class RenderSystem(Node2D root, StyleTable stylesTable, int maxBul
             mesh.SetInstanceTransform2D(slot, transform);
         }
 
-        for (var s = 0; s < _meshes.Count; s++)
-            _meshes[s].Multimesh.VisibleInstanceCount = _counts[s];
+        for (var styleIndex = 0; styleIndex < _meshes.Count; styleIndex++)
+            _meshes[styleIndex].Multimesh.VisibleInstanceCount = _counts[styleIndex];
     }
 
     /// Spin up a MultiMeshInstance2D for each newly registered style. Runs only
@@ -55,7 +55,7 @@ public sealed class RenderSystem(Node2D root, StyleTable stylesTable, int maxBul
         while (_meshes.Count < styles.Length)
         {
             var style = styles[_meshes.Count];
-            var node = new MultiMeshInstance2D
+            var meshInstance = new MultiMeshInstance2D
             {
                 Texture = Resolve(style.Texture),
                 Material = style.Material,
@@ -67,9 +67,9 @@ public sealed class RenderSystem(Node2D root, StyleTable stylesTable, int maxBul
                     VisibleInstanceCount = 0,
                 },
             };
-            
-            root.AddChild(node);
-            _meshes.Add(node);
+
+            root.AddChild(meshInstance);
+            _meshes.Add(meshInstance);
         }
 
         if (_counts.Length < _meshes.Count)

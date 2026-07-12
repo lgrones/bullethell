@@ -14,17 +14,17 @@ public sealed class BulletPool(int capacity) : IBulletSink
     public int Count => _pool.Count;
     public Span<Bullet> Active => CollectionsMarshal.AsSpan(_pool);
 
-    public void SpawnBullet(in BulletSpawn s) => _pending.Add(s);
+    public void SpawnBullet(in BulletSpawn spawn) => _pending.Add(spawn);
 
     public void Flush()
     {
-        foreach (var s in _pending)
+        foreach (var spawn in _pending)
             _pool.Add(new Bullet
             {
-                Position = s.Position,
-                Velocity = s.Velocity,
-                BehaviorId = s.BehaviorId,
-                StyleId = s.StyleId,
+                Position = spawn.Position,
+                Velocity = spawn.Velocity,
+                BehaviorId = spawn.BehaviorId,
+                StyleId = spawn.StyleId,
                 StateIndex = 0,
                 StateTimer = 0f,
                 Alive = true,

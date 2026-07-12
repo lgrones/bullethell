@@ -11,8 +11,8 @@ public partial class Ring : FrameModifier
 
     public override IEnumerable<Transform2D> Apply(IEnumerable<Transform2D> frames)
     {
-        foreach (var f in frames)
+        foreach (var frame in frames)
             for (var i = 0; i < Count; i++)
-                yield return f * new Transform2D(Mathf.Tau * i / Count, Vector2.Zero);
+                yield return frame * new Transform2D(Mathf.Tau * i / Count, Vector2.Zero);
     }
 }

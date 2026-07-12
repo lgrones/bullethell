@@ -15,7 +15,8 @@ public readonly record struct RoomContext(
     Hud Hud,
     Lives Lives,
     BulletField EnemyField,
-    BulletField PlayerField);
+    BulletField PlayerField,
+    int LifeCount);
 
 /// One streamed room in the continuous world. World lays these out side by side;
 /// the player/camera/HUD/fields persist across them. Boss rooms start their

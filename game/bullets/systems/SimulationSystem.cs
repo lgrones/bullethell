@@ -8,70 +8,76 @@ public sealed class SimulationSystem(BehaviorTable table) : IBulletSystem
 {
     public void Run(BulletPool pool, in BulletFrame frame)
     {
-        var span = pool.Active;
-        var defs = table.Defs;
+        var bullets = pool.Active;
+        var states = table.Defs;
 
-        for (var i = 0; i < span.Length; i++)
+        for (var i = 0; i < bullets.Length; i++)
         {
-            ref var b = ref span[i];
-            ref readonly var def = ref defs[table.Offset(b.BehaviorId) + b.StateIndex];
+            ref var bullet = ref bullets[i];
+            ref readonly var state = ref states[table.Offset(bullet.BehaviorId) + bullet.StateIndex];
 
-            b.StateTimer += frame.Dt;
+            bullet.StateTimer += frame.Dt;
 
-            switch (def.Move)
+            switch (state.Move)
             {
                 case MovementKind.Straight:
-                    b.Position += b.Velocity * frame.Dt;
+                    bullet.Position += bullet.Velocity * frame.Dt;
                     break;
 
                 case MovementKind.Homing:
                     if (frame.HasTarget)
                     {
-                        var desired = (frame.Target - b.Position).Normalized();
-                        var turn = Mathf.Clamp(b.Velocity.AngleTo(desired), -def.TurnRate * frame.Dt, def.TurnRate * frame.Dt);
-                        b.Velocity = b.Velocity.Rotated(turn);
+                        var desiredDirection = (frame.Target - bullet.Position).Normalized();
+                        var turnAngle = Mathf.Clamp(
+                            bullet.Velocity.AngleTo(desiredDirection),
+                            -state.TurnRate * frame.Dt,
+                            state.TurnRate * frame.Dt);
+
+                        bullet.Velocity = bullet.Velocity.Rotated(turnAngle);
                     }
 
-                    b.Position += b.Velocity * frame.Dt;
+                    bullet.Position += bullet.Velocity * frame.Dt;
                     break;
             }
 
-            if (!ShouldExit(def, b, frame)) continue;
+            if (!ShouldExit(state, bullet, frame))
+                continue;
 
-            var count = table.Count(b.BehaviorId);
-            if (b.StateIndex + 1 < count)
+            var stateCount = table.Count(bullet.BehaviorId);
+
+            if (bullet.StateIndex + 1 < stateCount)
             {
-                b.StateIndex++; // advance to next state
-                b.StateTimer = 0f;
+                bullet.StateIndex++;
+                bullet.StateTimer = 0f;
             }
             else // last state ended → die (maybe explode)
             {
-                if (def.OnEnd == DeathAction.Explode)
-                    Explode(pool, b.Position, b.StyleId, def);
+                if (state.OnEnd == DeathAction.Explode)
+                    Explode(pool, bullet.Position, bullet.StyleId, state);
 
-                b.Alive = false;
+                bullet.Alive = false;
             }
         }
     }
 
-    private static bool ShouldExit(in StateDefinition def, in Bullet b, in BulletFrame frame) =>
-        def.Exit switch
+    private static bool ShouldExit(in StateDefinition state, in Bullet bullet, in BulletFrame frame) =>
+        state.Exit switch
         {
-            TransitionKind.AfterTime => b.StateTimer >= def.ExitThreshold,
-            TransitionKind.NearTarget => frame.HasTarget && b.Position.DistanceTo(frame.Target) <= def.ExitThreshold,
+            TransitionKind.AfterTime => bullet.StateTimer >= state.ExitThreshold,
+            TransitionKind.NearTarget => frame.HasTarget && bullet.Position.DistanceTo(frame.Target) <= state.ExitThreshold,
             _ => false,
         };
 
-    private static void Explode(BulletPool pool, Vector2 at, byte styleId, in StateDefinition def)
+    private static void Explode(BulletPool pool, Vector2 position, byte styleId, in StateDefinition state)
     {
-        for (var i = 0; i < def.ExplodeCount; i++)
+        for (var shard = 0; shard < state.ExplodeCount; shard++)
         {
-            var dir = Vector2.FromAngle(Mathf.Tau * i / def.ExplodeCount);
+            var direction = Vector2.FromAngle(Mathf.Tau * shard / state.ExplodeCount);
 
             pool.SpawnBullet(new BulletSpawn
             {
-                Position = at,
-                Velocity = dir * def.ExplodeSpeed,
+                Position = position,
+                Velocity = direction * state.ExplodeSpeed,
                 StyleId = styleId
             });
         }

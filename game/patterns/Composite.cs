@@ -17,12 +17,12 @@ public partial class Composite : Pattern
         if (Source is null)
             throw new InvalidOperationException($"Composite not wired. Assign a {nameof(Source)} pattern");
 
-        IEnumerable<Transform2D> frames = [Transform2D.Identity];
+        IEnumerable<Transform2D> localFrames = [Transform2D.Identity];
 
         foreach (var modifier in Modifiers)
-            frames = modifier.Apply(frames);
+            localFrames = modifier.Apply(localFrames);
 
-        foreach (var local in frames)
-            Source.Emit(ctx, frame * local);
+        foreach (var localFrame in localFrames)
+            Source.Emit(ctx, frame * localFrame);
     }
 }

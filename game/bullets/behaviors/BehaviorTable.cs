@@ -39,26 +39,26 @@ public sealed class BehaviorTable
     private byte Register(BulletBehavior behavior)
     {
         var id = (byte)_offsets.Count;
-        
+
         _ids[behavior] = id;
         _offsets.Add(_defs.Count);
         _counts.Add(behavior.States.Count);
-        
-        foreach (var s in behavior.States)
-            _defs.Add(Bake(s));
-        
+
+        foreach (var state in behavior.States)
+            _defs.Add(Bake(state));
+
         return id;
     }
 
-    private static StateDefinition Bake(BulletState s)
+    private static StateDefinition Bake(BulletState state)
         => new()
         {
-            Move = s.Move,
-            TurnRate = s.TurnRate,
-            Exit = s.Exit,
-            ExitThreshold = s.ExitThreshold,
-            OnEnd = s.OnEnd,
-            ExplodeCount = s.ExplodeCount,
-            ExplodeSpeed = s.ExplodeSpeed,
+            Move = state.Move,
+            TurnRate = state.TurnRate,
+            Exit = state.Exit,
+            ExitThreshold = state.ExitThreshold,
+            OnEnd = state.OnEnd,
+            ExplodeCount = state.ExplodeCount,
+            ExplodeSpeed = state.ExplodeSpeed,
         };
 }

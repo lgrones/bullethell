@@ -21,30 +21,43 @@ public partial class MarisaBossRoom : Room
         if (seal != null)
             seal.Disabled = false;
 
-        // boss bullets damage the player; player shots damage the boss
-        ctx.EnemyField.Target = ctx.Player;
-        ctx.EnemyField.Hit += ctx.Player.Hit;
-        ctx.PlayerField.Target = _boss;
-        ctx.PlayerField.Hit += _boss.Hit;
+        // The fields are World-owned and outlive this room, so hold locals to
+        // undo the wiring on defeat — otherwise the next boss room's fields would
+        // still carry this fight's hit handlers.
+        var enemyField = ctx.EnemyField;
+        var playerField = ctx.PlayerField;
+        var player = ctx.Player;
 
-        _boss.Field = ctx.EnemyField;
-        _boss.PlayerTarget = ctx.Player;
-        _boss.Defeated += () => EmitSignal(Room.SignalName.Cleared);
+        // boss bullets damage the player; player shots damage the boss
+        enemyField.Target = player;
+        enemyField.Hit += player.Hit;
+        playerField.Target = _boss;
+        playerField.Hit += _boss.Hit;
+
+        _boss.Defeated += OnDefeated;
 
         // point the player's emitters at the shared player field
-        foreach (var emitter in ctx.Player.FindEmitters())
+        foreach (var emitter in player.FindEmitters())
         {
-            emitter.Initialize(ctx.PlayerField, ctx.PlayerField.Table, ctx.PlayerField.Styles);
+            emitter.Initialize(playerField, playerField.Table, playerField.Styles);
             emitter.Disable();
-            if (!ctx.Player.Emitters.Contains(emitter))
-                ctx.Player.Emitters.Add(emitter);
+            if (!player.Emitters.Contains(emitter))
+                player.Emitters.Add(emitter);
         }
 
-        _boss.Begin();
+        _boss.Begin(enemyField, player);
 
-        // Begin() builds the controller; bind HUD to it, then reset lives so the
-        // HUD catches the initial Changed emit.
-        ctx.Hud.Bind(_boss.Controller, ctx.Player, ctx.Lives);
-        ctx.Lives.Reset(3); // TODO: World should own the life count + persist it across bosses
+        // Begin() builds the controller (non-null from here); bind HUD to it, then
+        // reset lives so the HUD catches the initial Changed emit.
+        ctx.Hud.Bind(_boss.Controller!, player, ctx.Lives);
+        ctx.Lives.Reset(ctx.LifeCount);
+        return;
+
+        void OnDefeated()
+        {
+            enemyField.Hit -= player.Hit;
+            playerField.Hit -= _boss.Hit;
+            EmitSignal(Room.SignalName.Cleared);
+        }
     }
 }

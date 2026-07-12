@@ -9,9 +9,9 @@ public struct BulletSpawn
     public byte BehaviorId;
     public byte StyleId;
 
-    public readonly BulletSpawn Transformed(in Transform2D f) => this with
+    public readonly BulletSpawn Transformed(in Transform2D transform) => this with
     {
-        Position = f * Position,
-        Velocity = f.BasisXform(Velocity),
+        Position = transform * Position,
+        Velocity = transform.BasisXform(Velocity),
     };
 }
